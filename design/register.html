@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create account · Taskly design prototype</title>
+    <link rel="stylesheet" href="assets/tokens.css" />
+    <link rel="stylesheet" href="assets/app.css" />
+    <link rel="stylesheet" href="assets/prototype-bar.css" />
+  </head>
+  <body>
+    <main class="auth">
+      <div class="auth-card">
+        <section class="auth-card__form">
+          <a class="wordmark wordmark--lg" href="index.html">
+            <span class="wordmark__mark" aria-hidden="true">
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M2.5 8.5l3 3 8-8" />
+              </svg>
+            </span>
+            Taskly
+          </a>
+
+          <h1 class="auth-card__heading">Create your account</h1>
+          <p class="auth-card__sub">Start with one project. Add the team after.</p>
+
+          <form class="auth-form" novalidate>
+            <div class="field">
+              <label class="field__label" for="register-email">Email</label>
+              <!--
+                Register answers a taken email with a bare 409 and no fieldErrors. The page maps
+                it onto `email` by hand — so this is a field error, not a form-level one.
+              -->
+              <input
+                class="input"
+                id="register-email"
+                type="email"
+                autocomplete="email"
+                aria-describedby="register-email-error"
+                value="alice@example.com"
+                data-error-state-input
+              />
+              <p class="field__error" id="register-email-error" data-error-state hidden>
+                That email is already registered.
+              </p>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="register-password">Password</label>
+              <input
+                class="input"
+                id="register-password"
+                type="password"
+                autocomplete="new-password"
+                aria-describedby="register-password-hint"
+                value="password"
+              />
+              <p class="field__hint" id="register-password-hint">8–72 characters.</p>
+            </div>
+
+            <button class="btn btn--primary btn--lg btn--block" type="submit">
+              Create account
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M3 8h9M8.5 4.5L12 8l-3.5 3.5" />
+              </svg>
+            </button>
+
+            <p class="field__hint">
+              Registering signs you straight in — the app chains register → login for you.
+            </p>
+          </form>
+
+          <p class="auth-card__footer">Already have an account? <a href="login.html">Sign in</a></p>
+        </section>
+
+        <aside class="auth-card__aside">
+          <div class="auth-card__aside-copy">
+            <p class="auth-card__aside-title">Built around the list, not the board</p>
+            <p class="auth-card__aside-body">
+              Every task has an owner, a due date and a priority you can actually scan.
+            </p>
+          </div>
+
+          <img class="auth-card__illustration" src="assets/illustration-tasks.svg" alt="" />
+
+          <ul class="auth-points">
+            <li class="auth-point">
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M2.5 8.5l3.5 3.5 7.5-8" />
+              </svg>
+              Free while you are figuring out how you work
+            </li>
+            <li class="auth-point">
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M2.5 8.5l3.5 3.5 7.5-8" />
+              </svg>
+              Invite teammates by email, no seat juggling
+            </li>
+            <li class="auth-point">
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M2.5 8.5l3.5 3.5 7.5-8" />
+              </svg>
+              Your session survives a reload — no login flash
+            </li>
+          </ul>
+        </aside>
+      </div>
+    </main>
+
+    <div class="prototype-bar">
+      <a href="index.html">← All screens</a>
+      <span class="prototype-bar__sep" aria-hidden="true"></span>
+      <button class="prototype-bar__btn" type="button" data-toggle-error aria-pressed="false">
+        Preview 409 on email
+      </button>
+    </div>
+
+    <script src="assets/prototype-bar.js"></script>
+  </body>
+</html>

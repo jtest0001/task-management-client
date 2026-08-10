@@ -1,0 +1,115 @@
+/*
+ * Taskly design tokens — the single source of truth for this prototype.
+ *
+ * Every value here is mirrored in `src/index.css` as an oklch CSS variable, so the prototype
+ * and the React app cannot drift. Nothing outside this file may declare a raw colour.
+ *
+ * Palette direction comes from `moodboard/main screen.png`, whose teal is #24C0B8. That exact
+ * value is only 2.26:1 against white — it fails AA for button text and the 3:1 bar for borders
+ * and focus rings — so it is kept as the *brand accent* (washes, markers, illustration) while
+ * --primary is deepened to teal-600 #0A7F78 (4.86:1). The screen still reads as the moodboard.
+ */
+
+:root {
+  /* ---- Teal scale ------------------------------------------------------- */
+  --teal-50: #f0fbfa;
+  --teal-100: #d9f5f2;
+  --teal-200: #a9e9e3;
+  --teal-300: #6fd8d0;
+  --teal-400: #24c0b8; /* the moodboard swatch — accent only, never behind text */
+  --teal-500: #12a79f;
+  --teal-600: #0a7f78;
+  --teal-700: #08655f;
+  --teal-800: #0b5a55;
+  --teal-900: #0c4b47;
+  --teal-950: #06302e;
+
+  /* ---- Neutrals, faintly teal-cast (hue ~186) so greys sit with the brand -- */
+  --neutral-0: #ffffff;
+  --neutral-25: #fafbfb;
+  --neutral-50: #f6f8f8;
+  --neutral-100: #eef1f1;
+  --neutral-200: #e3e8e7;
+  --neutral-300: #ccd4d3;
+  --neutral-400: #9aa8a6;
+  --neutral-500: #5b6b69;
+  --neutral-700: #3f4a48;
+  --neutral-900: #131a19;
+
+  /* ---- Accents shared with status + priority ---------------------------- */
+  --amber-50: #fdf7ed;
+  --amber-600: #b45309;
+  --rose-50: #fceae9;
+  --rose-600: #be3a38;
+  --violet-50: #f1ebf8;
+  --violet-600: #6d45a8;
+
+  /* ---- Semantic surfaces ------------------------------------------------ */
+  --canvas: var(--neutral-50);
+  --surface: var(--neutral-0);
+  --surface-muted: var(--neutral-50);
+  --surface-sunken: var(--neutral-100);
+  --foreground: var(--neutral-900);
+  --muted-foreground: var(--neutral-500);
+  --border: var(--neutral-200);
+  --border-strong: var(--neutral-300);
+
+  --primary: var(--teal-600);
+  --primary-hover: var(--teal-700);
+  --primary-foreground: var(--neutral-0);
+  --brand: var(--teal-400);
+  --accent-wash: var(--teal-50);
+  --accent-foreground: var(--teal-700);
+  --ring: var(--teal-600);
+
+  --destructive: var(--rose-600);
+  --destructive-wash: var(--rose-50);
+
+  /* ---- Status (TODO | IN_PROGRESS | DONE — the real enum) --------------- */
+  --status-todo-soft: var(--neutral-100);
+  --status-todo: var(--neutral-700);
+  --status-progress-soft: var(--amber-50);
+  --status-progress: var(--amber-600);
+  --status-done-soft: var(--teal-100);
+  --status-done: var(--teal-700);
+
+  /* ---- Priority (LOW | MEDIUM | HIGH) ----------------------------------- */
+  --priority-low-soft: var(--violet-50);
+  --priority-low: var(--violet-600);
+  --priority-medium-soft: var(--teal-100);
+  --priority-medium: var(--teal-700);
+  --priority-high-soft: var(--rose-50);
+  --priority-high: var(--rose-600);
+
+  /* ---- Typography ------------------------------------------------------- */
+  --font-sans: "Geist Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --tracking-normal: -0.01em;
+  --tracking-wide: 0.06em;
+
+  /* ---- Radius ----------------------------------------------------------- */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 999px;
+
+  /* ---- Shadows — the soft, low-opacity set already used by the app ------ */
+  --shadow-xs: 0 1px 2px -1px rgb(19 26 25 / 0.06);
+  --shadow-sm: 0 4px 10px -2px rgb(19 26 25 / 0.05), 0 1px 2px -3px rgb(19 26 25 / 0.05);
+  --shadow-md: 0 4px 10px -2px rgb(19 26 25 / 0.07), 0 2px 4px -3px rgb(19 26 25 / 0.05);
+  --shadow-lg: 0 12px 28px -6px rgb(19 26 25 / 0.12), 0 4px 8px -4px rgb(19 26 25 / 0.06);
+  --shadow-xl: 0 32px 64px -16px rgb(12 75 71 / 0.24);
+
+  /* ---- Layout ----------------------------------------------------------- */
+  --rail-width: 16rem;
+  --topbar-height: 3.5rem;
+  --panel-width: 24rem;
+}

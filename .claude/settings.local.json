@@ -12,7 +12,8 @@
       "Bash(curl -s -i -b c.txt -c c.txt -X POST http://localhost:3000/auth/refresh)",
       "Bash(npm create *)",
       "Bash(echo \"EXIT=$?\")",
-      "Bash(npx create-vite@9.1.2 --help)"
+      "Bash(npx create-vite@9.1.2 --help)",
+      "Bash(npx prettier *)"
     ]
   }
 }

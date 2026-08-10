@@ -5,40 +5,90 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Palette: teal, taken from `moodboard/main screen.png` and specified in
+ * `design/assets/tokens.css` — the two files are the same system in two notations, so change
+ * both together.
+ *
+ * The moodboard's teal is #24C0B8. At 2.26:1 against white it cannot legally carry button text
+ * or a focus ring, so it lives on as `--brand` (soft washes, the active-project marker, charts)
+ * while `--primary` is the deeper #0A7F78 at 4.86:1.
+ *
+ *   teal-50  #F0FBFA   teal-100 #D9F5F2   teal-200 #A9E9E3   teal-300 #6FD8D0
+ *   teal-400 #24C0B8   teal-500 #12A79F   teal-600 #0A7F78   teal-700 #08655F
+ *   teal-800 #0B5A55   teal-900 #0C4B47   teal-950 #06302E
+ *
+ * Neutrals carry a faint teal cast (hue ~186) so greys sit with the brand rather than against it.
+ */
 :root {
   --background: oklch(1 0 0);
-  --foreground: oklch(0.2077 0.0398 265.7549);
+  --foreground: oklch(0.2103 0.0106 185.78); /* #131A19 — 17.65:1 */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2077 0.0398 265.7549);
+  --card-foreground: oklch(0.2103 0.0106 185.78);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2077 0.0398 265.7549);
-  --primary: oklch(0.5461 0.2152 262.8809);
+  --popover-foreground: oklch(0.2103 0.0106 185.78);
+  --primary: oklch(0.5384 0.0917 187.96); /* teal-600 #0A7F78 — 4.86:1 on white */
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.9683 0.0069 247.8956);
-  --secondary-foreground: oklch(0.2795 0.0368 260.031);
-  --muted: oklch(0.9842 0.0034 247.8575);
-  --muted-foreground: oklch(0.5544 0.0407 257.4166);
-  --accent: oklch(0.9705 0.0142 254.6042);
-  --accent-foreground: oklch(0.4244 0.1809 265.6377);
-  --destructive: oklch(0.6368 0.2078 25.3313);
+  --secondary: oklch(0.9559 0.0032 197.1);
+  --secondary-foreground: oklch(0.3986 0.0146 183.41);
+  --muted: oklch(0.9776 0.0021 197.12);
+  --muted-foreground: oklch(0.5138 0.0196 187.39); /* #5B6B69 — 5.60:1 */
+  --accent: oklch(0.9796 0.0117 190.45); /* teal-50 */
+  --accent-foreground: oklch(0.4575 0.0776 187.59); /* teal-700 */
+  --destructive: oklch(0.5427 0.169 25.51); /* #BE3A38 — 5.45:1, same red as HIGH */
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9288 0.0126 255.5078);
-  --input: oklch(0.9288 0.0126 255.5078);
-  --ring: oklch(0.6231 0.188 259.8145);
-  --chart-1: oklch(0.5461 0.2152 262.8809);
-  --chart-2: oklch(0.5854 0.2041 277.1173);
-  --chart-3: oklch(0.2077 0.0398 265.7549);
-  --chart-4: oklch(0.7107 0.0351 256.7878);
-  --chart-5: oklch(0.869 0.0198 252.8943);
-  --sidebar: oklch(0.9842 0.0034 247.8575);
-  --sidebar-foreground: oklch(0.3717 0.0392 257.287);
-  --sidebar-primary: oklch(0.5461 0.2152 262.8809);
+  --border: oklch(0.9269 0.0055 183.02);
+  --input: oklch(0.9269 0.0055 183.02);
+  --ring: oklch(0.5384 0.0917 187.96);
+  --brand: oklch(0.7315 0.1205 189.35); /* teal-400 — accents only, never behind text */
+
+  /* Full teal scale — mirrors design/assets/tokens.css --teal-*. Only used where a screen (the
+     auth split-panel) needs the raw ramp instead of a semantic token. */
+  --teal-50: #f0fbfa;
+  --teal-100: #d9f5f2;
+  --teal-200: #a9e9e3;
+  --teal-300: #6fd8d0;
+  --teal-400: #24c0b8;
+  --teal-500: #12a79f;
+  --teal-600: #0a7f78;
+  --teal-700: #08655f;
+  --teal-800: #0b5a55;
+  --teal-900: #0c4b47;
+  --teal-950: #06302e;
+
+  --chart-1: oklch(0.5384 0.0917 187.96);
+  --chart-2: oklch(0.7315 0.1205 189.35);
+  --chart-3: oklch(0.4856 0.1535 299.25);
+  --chart-4: oklch(0.5553 0.1455 49);
+  --chart-5: oklch(0.3745 0.0602 188.4);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.3986 0.0146 183.41);
+  --sidebar-primary: oklch(0.5384 0.0917 187.96);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.9683 0.0069 247.8956);
-  --sidebar-accent-foreground: oklch(0.2077 0.0398 265.7549);
-  --sidebar-border: oklch(0.9288 0.0126 255.5078);
-  --sidebar-ring: oklch(0.6231 0.188 259.8145);
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --sidebar-accent: oklch(0.9796 0.0117 190.45);
+  --sidebar-accent-foreground: oklch(0.4575 0.0776 187.59);
+  --sidebar-border: oklch(0.9269 0.0055 183.02);
+  --sidebar-ring: oklch(0.5384 0.0917 187.96);
+
+  /*
+   * Status and priority. Every pair is a soft fill plus an AA-passing text colour, because a
+   * badge has to say what it means — colour alone is never the signal.
+   * TaskStatus is TODO | IN_PROGRESS | DONE; TaskPriority is LOW | MEDIUM | HIGH.
+   */
+  --status-todo: oklch(0.3986 0.0146 183.41);
+  --status-todo-soft: oklch(0.9559 0.0032 197.1);
+  --status-progress: oklch(0.5553 0.1455 49); /* #B45309 — 5.02:1 */
+  --status-progress-soft: oklch(0.9781 0.0147 80.71);
+  --status-done: oklch(0.4575 0.0776 187.59); /* teal-700 — 6.91:1 */
+  --status-done-soft: oklch(0.9491 0.0295 188.85);
+  --priority-low: oklch(0.4856 0.1535 299.25); /* #6D45A8 — 6.85:1 */
+  --priority-low-soft: oklch(0.9485 0.0184 306.66);
+  --priority-medium: oklch(0.4575 0.0776 187.59);
+  --priority-medium-soft: oklch(0.9491 0.0295 188.85);
+  --priority-high: oklch(0.5427 0.169 25.51); /* #BE3A38 — 5.45:1 */
+  --priority-high-soft: oklch(0.9511 0.0197 21.36);
+
+  --font-sans: "Geist Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: "Georgia", serif;
   --font-mono: "JetBrains Mono", monospace;
   --radius: 0.5rem;
@@ -60,40 +110,59 @@
   --spacing: 0.25rem;
 }
 
+/*
+ * On a dark ground the moodboard teal is the correct primary — #24C0B8 against the teal-tinted
+ * canvas is 7.05:1 — so `--primary` and `--brand` converge here.
+ */
 .dark {
-  --background: oklch(0.1288 0.0406 264.6952);
-  --foreground: oklch(0.9842 0.0034 247.8575);
-  --card: oklch(0.2077 0.0398 265.7549);
-  --card-foreground: oklch(0.9842 0.0034 247.8575);
-  --popover: oklch(0.1288 0.0406 264.6952);
-  --popover-foreground: oklch(0.9842 0.0034 247.8575);
-  --primary: oklch(0.6231 0.188 259.8145);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.2795 0.0368 260.031);
-  --secondary-foreground: oklch(0.9683 0.0069 247.8956);
-  --muted: oklch(0.2795 0.0368 260.031);
-  --muted-foreground: oklch(0.7107 0.0351 256.7878);
-  --accent: oklch(0.2795 0.0368 260.031);
-  --accent-foreground: oklch(0.8823 0.0571 254.1284);
-  --destructive: oklch(0.3958 0.1331 25.723);
-  --destructive-foreground: oklch(0.8845 0.0593 18.3341);
-  --border: oklch(0.2795 0.0368 260.031);
-  --input: oklch(0.2795 0.0368 260.031);
-  --ring: oklch(0.6231 0.188 259.8145);
-  --chart-1: oklch(0.6231 0.188 259.8145);
-  --chart-2: oklch(0.6801 0.1583 276.9349);
-  --chart-3: oklch(0.7137 0.1434 254.624);
-  --chart-4: oklch(0.7107 0.0351 256.7878);
-  --chart-5: oklch(0.4455 0.0374 257.2808);
-  --sidebar: oklch(0.1288 0.0406 264.6952);
-  --sidebar-foreground: oklch(0.7107 0.0351 256.7878);
-  --sidebar-primary: oklch(0.6231 0.188 259.8145);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.2795 0.0368 260.031);
-  --sidebar-accent-foreground: oklch(0.9842 0.0034 247.8575);
-  --sidebar-border: oklch(0.2795 0.0368 260.031);
-  --sidebar-ring: oklch(0.6231 0.188 259.8145);
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --background: oklch(0.16 0.018 190);
+  --foreground: oklch(0.9776 0.0021 197.12);
+  --card: oklch(0.22 0.019 190);
+  --card-foreground: oklch(0.9776 0.0021 197.12);
+  --popover: oklch(0.22 0.019 190);
+  --popover-foreground: oklch(0.9776 0.0021 197.12);
+  --primary: oklch(0.7315 0.1205 189.35); /* teal-400 */
+  --primary-foreground: oklch(0.2103 0.0106 185.78);
+  --secondary: oklch(0.28 0.02 190);
+  --secondary-foreground: oklch(0.9776 0.0021 197.12);
+  --muted: oklch(0.28 0.02 190);
+  --muted-foreground: oklch(0.7199 0.016 186.52);
+  --accent: oklch(0.28 0.02 190);
+  --accent-foreground: oklch(0.8894 0.0649 188.8);
+  --destructive: oklch(0.705 0.145 25.5);
+  --destructive-foreground: oklch(0.2103 0.0106 185.78);
+  --border: oklch(0.29 0.02 190);
+  --input: oklch(0.29 0.02 190);
+  --ring: oklch(0.7315 0.1205 189.35);
+  --brand: oklch(0.7315 0.1205 189.35);
+  --chart-1: oklch(0.7315 0.1205 189.35);
+  --chart-2: oklch(0.8173 0.0986 188.88);
+  --chart-3: oklch(0.7 0.13 299);
+  --chart-4: oklch(0.75 0.13 60);
+  --chart-5: oklch(0.6579 0.1115 188.69);
+  --sidebar: oklch(0.16 0.018 190);
+  --sidebar-foreground: oklch(0.7199 0.016 186.52);
+  --sidebar-primary: oklch(0.7315 0.1205 189.35);
+  --sidebar-primary-foreground: oklch(0.2103 0.0106 185.78);
+  --sidebar-accent: oklch(0.28 0.02 190);
+  --sidebar-accent-foreground: oklch(0.9776 0.0021 197.12);
+  --sidebar-border: oklch(0.29 0.02 190);
+  --sidebar-ring: oklch(0.7315 0.1205 189.35);
+
+  --status-todo: oklch(0.8635 0.0088 188.08);
+  --status-todo-soft: oklch(0.28 0.02 190);
+  --status-progress: oklch(0.8 0.12 65);
+  --status-progress-soft: oklch(0.3 0.045 65);
+  --status-done: oklch(0.8173 0.0986 188.88);
+  --status-done-soft: oklch(0.3 0.045 189);
+  --priority-low: oklch(0.8 0.09 300);
+  --priority-low-soft: oklch(0.3 0.05 300);
+  --priority-medium: oklch(0.8173 0.0986 188.88);
+  --priority-medium-soft: oklch(0.3 0.045 189);
+  --priority-high: oklch(0.775 0.12 22);
+  --priority-high-soft: oklch(0.3 0.06 22);
+
+  --font-sans: "Geist Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: "Georgia", serif;
   --font-mono: "JetBrains Mono", monospace;
   --radius: 0.5rem;
@@ -147,6 +216,32 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* `bg-priority-high-soft text-priority-high` instead of a hex per component. */
+  --color-brand: var(--brand);
+  --color-teal-50: var(--teal-50);
+  --color-teal-100: var(--teal-100);
+  --color-teal-200: var(--teal-200);
+  --color-teal-300: var(--teal-300);
+  --color-teal-400: var(--teal-400);
+  --color-teal-500: var(--teal-500);
+  --color-teal-600: var(--teal-600);
+  --color-teal-700: var(--teal-700);
+  --color-teal-800: var(--teal-800);
+  --color-teal-900: var(--teal-900);
+  --color-teal-950: var(--teal-950);
+  --color-status-todo: var(--status-todo);
+  --color-status-todo-soft: var(--status-todo-soft);
+  --color-status-progress: var(--status-progress);
+  --color-status-progress-soft: var(--status-progress-soft);
+  --color-status-done: var(--status-done);
+  --color-status-done-soft: var(--status-done-soft);
+  --color-priority-low: var(--priority-low);
+  --color-priority-low-soft: var(--priority-low-soft);
+  --color-priority-medium: var(--priority-medium);
+  --color-priority-medium-soft: var(--priority-medium-soft);
+  --color-priority-high: var(--priority-high);
+  --color-priority-high-soft: var(--priority-high-soft);
+
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
@@ -181,4 +276,14 @@
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
   }
+}
+
+/* Auth split-panel backdrops — too specific to name as semantic tokens, so they're utilities
+   instead of inline styles. Reused by login/register via AuthCard. */
+@utility bg-auth-glow {
+  background: radial-gradient(60rem 40rem at 15% 20%, rgb(36 192 184 / 0.16), transparent 60%);
+}
+
+@utility bg-auth-aside {
+  background: linear-gradient(170deg, var(--teal-50), var(--teal-100));
 }
