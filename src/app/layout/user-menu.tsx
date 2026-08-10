@@ -1,4 +1,4 @@
-import { LogOutIcon } from "lucide-react"
+import { ChevronDownIcon, LogOutIcon } from "lucide-react"
 import { useState } from "react"
 import { useNavigate } from "react-router"
 
@@ -23,13 +23,15 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full" aria-label="Account menu">
+        <Button variant="ghost" className="h-9 gap-2 rounded-full pr-2.5 pl-1" aria-label="Account menu">
           <span
             aria-hidden
-            className="bg-muted flex size-7 items-center justify-center rounded-full text-xs font-medium"
+            className="flex size-7 shrink-0 items-center justify-center rounded-full bg-teal-100 text-xs font-semibold text-teal-700 uppercase"
           >
             {initial}
           </span>
+          <span className="hidden max-w-36 truncate text-sm font-normal sm:inline">{user?.email ?? "…"}</span>
+          <ChevronDownIcon aria-hidden className="text-muted-foreground size-4 shrink-0" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">

@@ -10,6 +10,10 @@
  * --primary is deepened to teal-600 #0A7F78 (4.86:1). The screen still reads as the moodboard.
  */
 
+/* Same font the real app loads via `src/index.css` — without this the --font-sans declaration
+   below silently falls back to system-ui and the prototype stops being an accurate spec. */
+@import "@fontsource-variable/geist";
+
 :root {
   /* ---- Teal scale ------------------------------------------------------- */
   --teal-50: #f0fbfa;

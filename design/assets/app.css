@@ -329,7 +329,9 @@ img {
   border-color: var(--border-strong);
 }
 
-.input[aria-invalid="true"] {
+.input[aria-invalid="true"],
+.select[aria-invalid="true"],
+.textarea[aria-invalid="true"] {
   border-color: var(--destructive);
 }
 

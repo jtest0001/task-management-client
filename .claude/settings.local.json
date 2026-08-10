@@ -13,7 +13,7 @@
       "Bash(npm create *)",
       "Bash(echo \"EXIT=$?\")",
       "Bash(npx create-vite@9.1.2 --help)",
-      "Bash(npx prettier *)"
+      "Bash(npm run format)"
     ]
   }
 }

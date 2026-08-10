@@ -24,12 +24,18 @@ const USERS = {
 
 const CURRENT_USER = USERS.u1
 
-/** Due dates are relative to today so "overdue" and "due soon" always demonstrate themselves. */
+/**
+ * Due dates are relative to today so "overdue" and "due soon" always demonstrate themselves.
+ * Formats the local calendar date directly — going through `toISOString()` converts local
+ * midnight to UTC, which lands on the previous day for any timezone east of UTC.
+ */
 function dueIn(days) {
   const d = new Date()
-  d.setHours(0, 0, 0, 0)
   d.setDate(d.getDate() + days)
-  return d.toISOString().slice(0, 10)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, "0")
+  const date = String(d.getDate()).padStart(2, "0")
+  return `${year}-${month}-${date}`
 }
 
 const PROJECTS = [
@@ -534,16 +540,18 @@ function taskRow(task) {
          <span class="person__name">Unassigned</span>
        </span>`
 
+  const overdue = Boolean(task.dueDate) && isOverdue(task.dueDate) && !done
+  const overdueIcon = overdue
+    ? `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
+            aria-hidden="true"><circle cx="8" cy="8" r="6.5" />
+            <path d="M8 4.5V8l2 2" stroke-linecap="round" /></svg>`
+    : ""
+  const overdueSuffix = overdue ? " (overdue)" : ""
+
   const dueCell = task.dueDate
-    ? `<span class="due ${isOverdue(task.dueDate) && !done ? "due--overdue" : ""}">
-         ${
-           isOverdue(task.dueDate) && !done
-             ? `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
-                     aria-hidden="true"><circle cx="8" cy="8" r="6.5" />
-                     <path d="M8 4.5V8l2 2" stroke-linecap="round" /></svg>`
-             : ""
-         }
-         ${formatDate(task.dueDate)}${isOverdue(task.dueDate) && !done ? " (overdue)" : ""}
+    ? `<span class="due ${overdue ? "due--overdue" : ""}">
+         ${overdueIcon}
+         ${formatDate(task.dueDate)}${overdueSuffix}
        </span>`
     : `<span class="muted">No due date</span>`
 
@@ -742,16 +750,20 @@ function renderMembers() {
   const rows = MEMBERS[state.projectId]
     .map((member) => {
       const isOwner = member.role === "OWNER"
+      const adminSelected = member.role === "ADMIN" ? "selected" : ""
+      const memberSelected = member.role === "MEMBER" ? "selected" : ""
+      const ownerBadgeModifier = isOwner ? "badge--owner" : ""
+
       const roleCell =
         canChangeMemberRole(project.role) && !isOwner
           ? `<label class="visually-hidden" for="role-${member.user.id}">
                Role for ${esc(member.user.email)}
              </label>
              <select class="select" id="role-${member.user.id}" style="width: 8rem">
-               <option ${member.role === "ADMIN" ? "selected" : ""}>ADMIN</option>
-               <option ${member.role === "MEMBER" ? "selected" : ""}>MEMBER</option>
+               <option ${adminSelected}>ADMIN</option>
+               <option ${memberSelected}>MEMBER</option>
              </select>`
-          : `<span class="badge badge--role ${isOwner ? "badge--owner" : ""}">${member.role}</span>`
+          : `<span class="badge badge--role ${ownerBadgeModifier}">${member.role}</span>`
 
       // OWNER is never removable; an ADMIN may only remove MEMBERs.
       const removable =
@@ -1045,6 +1057,7 @@ document.addEventListener("click", (event) => {
     state.projectId = project.dataset.project
     state.taskId = null
     state.listState = "loaded"
+    document.getElementById("state-select").value = "loaded"
     render()
     return
   }

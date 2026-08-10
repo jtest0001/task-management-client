@@ -18,9 +18,9 @@ interface BackendErrorBody {
  *   401 / 403 / 404 / 409 / 500 `{ message }`
  */
 export class ApiError extends Error {
-  readonly status: number
-  readonly fieldErrors: FieldErrors
-  readonly formErrors: string[]
+  status: number
+  fieldErrors: FieldErrors
+  formErrors: string[]
 
   constructor(status: number, message: string, fieldErrors: FieldErrors = {}, formErrors: string[] = []) {
     super(message)

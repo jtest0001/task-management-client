@@ -33,3 +33,15 @@ export interface UserSummary {
   id: string
   email: string
 }
+
+/** The 5-field select nested in `GET /projects` — not a whole `Project` row. */
+export interface ProjectListItem {
+  id: string
+  name: string
+  description: string | null
+  ownerId: string
+  createdAt: string
+}
+
+/** Flattened view of a `GET /projects` row: the project plus the caller's role in it. */
+export type ProjectSummary = ProjectListItem & { role: ProjectRole }
