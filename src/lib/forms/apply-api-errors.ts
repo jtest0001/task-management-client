@@ -15,7 +15,7 @@ import { toApiError } from "@/lib/api/errors"
 export function applyApiErrors<T extends FieldValues>(
   error: unknown,
   setError: UseFormSetError<T>,
-  fields: readonly Path<T>[]
+  fields: Path<T>[]
 ) {
   const apiError = toApiError(error)
 

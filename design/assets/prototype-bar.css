@@ -1,0 +1,57 @@
+/*
+ * Prototype-only chrome. Nothing here is part of the design system — it exists so the static
+ * pages can demonstrate states that the real app reaches through data. Do not port it.
+ */
+
+.prototype-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  translate: -50% 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  font-size: var(--text-sm);
+}
+
+.prototype-bar a {
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+
+.prototype-bar a:hover {
+  color: var(--foreground);
+}
+
+.prototype-bar__sep {
+  width: 1px;
+  height: 1rem;
+  background: var(--border);
+}
+
+.prototype-bar__btn {
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.prototype-bar__btn:hover {
+  background: var(--surface-muted);
+  color: var(--foreground);
+}
+
+.prototype-bar__btn[aria-pressed="true"] {
+  background: var(--accent-wash);
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+  color: var(--accent-foreground);
+}

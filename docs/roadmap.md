@@ -103,6 +103,13 @@ Carry these forward; they are consequences of the real API, not preferences.
 7. **Access token in memory only**; restored at boot by one refresh call.
 8. **Refresh skip-list is explicit** — `/auth/login`, `/auth/register`, `/auth/refresh`.
    `/auth/me` _must_ participate in refresh.
+9. **The design system is teal, and `--primary` is not the moodboard's teal.** `moodboard/`
+   supplies the direction; its brand colour is `#24C0B8`, which is only **2.26:1** against white
+   and therefore cannot carry button text or a focus ring. `#24C0B8` stays as `--brand` — soft
+   washes, the active-project marker, chart fills, the auth illustration — while `--primary` is
+   the deeper `#0A7F78` (**4.86:1**). Do not "restore" the lighter teal to `--primary`.
+   `design/` holds the full spec as static HTML (`npm run prototype`); `design/assets/tokens.css`
+   and `src/index.css` are the same system in two notations, so change them together.
 
 ---
 

@@ -21,6 +21,15 @@ export function LoginPage() {
     <AuthCard
       title="Sign in"
       subtitle="Pick up where you left off."
+      aside={{
+        title: "Everything your team owes, in one list",
+        body: "Projects, tasks, owners and due dates — without the ceremony.",
+        points: [
+          "Group work by project, assign it to a teammate",
+          "Filter, sort and search a list that stays shareable",
+          "Discuss the work where the work lives"
+        ]
+      }}
       footer={
         <>
           Don't have an account?{" "}

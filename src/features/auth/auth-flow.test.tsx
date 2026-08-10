@@ -16,7 +16,8 @@ const signedOut = () =>
 
 const signedIn = () => [
   http.post(`${API}/auth/refresh`, () => HttpResponse.json({ accessToken: "access-token" })),
-  http.get(`${API}/auth/me`, () => HttpResponse.json(USER))
+  http.get(`${API}/auth/me`, () => HttpResponse.json(USER)),
+  http.get(`${API}/projects`, () => HttpResponse.json([]))
 ]
 
 describe("authentication", () => {
@@ -44,7 +45,8 @@ describe("authentication", () => {
     server.use(
       signedOut(),
       http.post(`${API}/auth/login`, () => HttpResponse.json({ user: USER, accessToken: "access-token" })),
-      http.get(`${API}/auth/me`, () => HttpResponse.json(USER))
+      http.get(`${API}/auth/me`, () => HttpResponse.json(USER)),
+      http.get(`${API}/projects`, () => HttpResponse.json([]))
     )
 
     renderApp(<AppRoutes />, { route: "/projects" })
@@ -117,7 +119,8 @@ describe("authentication", () => {
         return HttpResponse.json(USER, { status: 201 })
       }),
       http.post(`${API}/auth/login`, () => HttpResponse.json({ user: USER, accessToken: "access-token" })),
-      http.get(`${API}/auth/me`, () => HttpResponse.json(USER))
+      http.get(`${API}/auth/me`, () => HttpResponse.json(USER)),
+      http.get(`${API}/projects`, () => HttpResponse.json([]))
     )
 
     renderApp(<AppRoutes />, { route: "/register" })

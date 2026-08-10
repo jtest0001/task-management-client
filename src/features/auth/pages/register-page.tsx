@@ -13,6 +13,15 @@ export function RegisterPage() {
     <AuthCard
       title="Create your account"
       subtitle="Start organising work in minutes."
+      aside={{
+        title: "Built around the list, not the board",
+        body: "Every task has an owner, a due date and a priority you can actually scan.",
+        points: [
+          "Free while you are figuring out how you work",
+          "Invite teammates by email, no seat juggling",
+          "Your session survives a reload — no login flash"
+        ]
+      }}
       footer={
         <>
           Already have an account?{" "}

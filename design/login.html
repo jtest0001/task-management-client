@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign in · Taskly design prototype</title>
+    <link rel="stylesheet" href="assets/tokens.css" />
+    <link rel="stylesheet" href="assets/app.css" />
+    <link rel="stylesheet" href="assets/prototype-bar.css" />
+  </head>
+  <body>
+    <main class="auth">
+      <div class="auth-card">
+        <section class="auth-card__form">
+          <a class="wordmark wordmark--lg" href="index.html">
+            <span class="wordmark__mark" aria-hidden="true">
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M2.5 8.5l3 3 8-8" />
+              </svg>
+            </span>
+            Taskly
+          </a>
+
+          <h1 class="auth-card__heading">Welcome back</h1>
+          <p class="auth-card__sub">Pick up where you left off.</p>
+
+          <form class="auth-form" novalidate>
+            <!--
+              Bad credentials come back as a generic 401 with no fieldErrors — the backend
+              deliberately does not reveal whether the email exists — so the message is
+              form-level, never attached to an input.
+            -->
+            <div class="alert alert--error" role="alert" data-error-state hidden>
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <circle cx="8" cy="8" r="6.5" />
+                <path d="M8 5v3.5M8 11h.01" />
+              </svg>
+              <span>Email or password is incorrect.</span>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="login-email">Email</label>
+              <input
+                class="input"
+                id="login-email"
+                type="email"
+                autocomplete="email"
+                placeholder="you@example.com"
+                value="alice@example.com"
+              />
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="login-password">Password</label>
+              <input
+                class="input"
+                id="login-password"
+                type="password"
+                autocomplete="current-password"
+                value="password"
+              />
+            </div>
+
+            <button class="btn btn--primary btn--lg btn--block" type="submit">
+              Sign in
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M3 8h9M8.5 4.5L12 8l-3.5 3.5" />
+              </svg>
+            </button>
+          </form>
+
+          <p class="auth-card__footer">Don't have an account? <a href="register.html">Create one</a></p>
+        </section>
+
+        <aside class="auth-card__aside">
+          <div class="auth-card__aside-copy">
+            <p class="auth-card__aside-title">Everything your team owes, in one list</p>
+            <p class="auth-card__aside-body">Projects, tasks, owners and due dates — without the ceremony.</p>
+          </div>
+
+          <img class="auth-card__illustration" src="assets/illustration-tasks.svg" alt="" />
+
+          <ul class="auth-points">
+            <li class="auth-point">
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M2.5 8.5l3.5 3.5 7.5-8" />
+              </svg>
+              Group work by project, assign it to a teammate
+            </li>
+            <li class="auth-point">
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M2.5 8.5l3.5 3.5 7.5-8" />
+              </svg>
+              Filter, sort and search a list that stays shareable
+            </li>
+            <li class="auth-point">
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M2.5 8.5l3.5 3.5 7.5-8" />
+              </svg>
+              Discuss the work where the work lives
+            </li>
+          </ul>
+        </aside>
+      </div>
+    </main>
+
+    <div class="prototype-bar">
+      <a href="index.html">← All screens</a>
+      <span class="prototype-bar__sep" aria-hidden="true"></span>
+      <button class="prototype-bar__btn" type="button" data-toggle-error aria-pressed="false">
+        Preview error state
+      </button>
+    </div>
+
+    <script src="assets/prototype-bar.js"></script>
+  </body>
+</html>

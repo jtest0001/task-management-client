@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workspace · Taskly design prototype</title>
+    <link rel="stylesheet" href="assets/tokens.css" />
+    <link rel="stylesheet" href="assets/app.css" />
+    <link rel="stylesheet" href="assets/prototype-bar.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <div class="shell">
+      <!--
+        Top bar mirrors `src/app/layout/app-shell.tsx`. There is deliberately no global search:
+        the API only searches task titles inside one project, so a workspace-wide search box
+        would promise something the backend cannot answer.
+      -->
+      <header class="topbar">
+        <a class="wordmark" href="index.html">
+          <span class="wordmark__mark" aria-hidden="true">
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M2.5 8.5l3 3 8-8" />
+            </svg>
+          </span>
+          Taskly
+        </a>
+
+        <div class="topbar__spacer"></div>
+
+        <div class="topbar__tools">
+          <label class="visually-hidden" for="state-select">Prototype: task list state</label>
+          <select class="select" id="state-select">
+            <option value="loaded">State: loaded</option>
+            <option value="loading">State: loading</option>
+            <option value="empty">State: no tasks yet</option>
+            <option value="filtered">State: no tasks match</option>
+            <option value="error">State: error</option>
+          </select>
+
+          <button class="user-menu" type="button" aria-haspopup="menu" aria-expanded="false">
+            <span class="avatar" aria-hidden="true">A</span>
+            <span class="user-menu__email">alice@example.com</span>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M4 6l4 4 4-4" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="shell__body">
+        <!-- Projects: the left rail. Its query is also the only source of the caller's role. -->
+        <nav class="rail" aria-label="Projects">
+          <div class="rail__heading">
+            <span class="eyebrow">Projects</span>
+            <button
+              class="btn btn--icon-sm btn--ghost"
+              type="button"
+              data-open-dialog="project"
+              aria-label="New project"
+            >
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="M8 3.5v9M3.5 8h9" />
+              </svg>
+            </button>
+          </div>
+
+          <ul class="rail__list" id="rail-list"></ul>
+
+          <div class="rail__footer">
+            <div class="invite-card">
+              <p class="invite-card__title">Working alone?</p>
+              <p class="invite-card__body">
+                Add teammates by email — they join as members and can pick up tasks right away.
+              </p>
+              <div class="avatar-stack" aria-hidden="true">
+                <span class="avatar">B</span>
+                <span class="avatar">C</span>
+                <span class="avatar">D</span>
+              </div>
+              <button class="btn btn--primary btn--sm btn--block" type="button" data-goto-members>
+                Invite a teammate
+              </button>
+            </div>
+          </div>
+        </nav>
+
+        <main class="main" id="main">
+          <header class="pane-header">
+            <div>
+              <h1 class="pane-header__title" id="project-name">…</h1>
+              <p class="pane-header__meta">
+                <span id="project-description"></span>
+                <span class="badge badge--role" id="project-role">MEMBER</span>
+              </p>
+            </div>
+            <div class="pane-header__actions" id="project-actions"></div>
+          </header>
+
+          <!-- Tabs are real links in the app (the tab state *is* the URL), buttons here. -->
+          <nav class="tabs" aria-label="Project sections" id="tabs">
+            <button class="tabs__link" type="button" data-tab="tasks" aria-current="page">Tasks</button>
+            <button class="tabs__link" type="button" data-tab="members">Members</button>
+            <button class="tabs__link" type="button" data-tab="labels">Labels</button>
+          </nav>
+
+          <div class="pane-body" id="pane-body"></div>
+        </main>
+
+        <!-- Task detail. URL-addressable in the app: /projects/:projectId/tasks/:taskId -->
+        <aside class="panel" id="task-panel" aria-label="Task detail" hidden></aside>
+      </div>
+    </div>
+
+    <!-- ============================================================ dialogs -->
+
+    <div class="dialog-backdrop" id="dialog-project" hidden>
+      <div
+        class="dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dialog-project-title"
+        aria-describedby="dialog-project-desc"
+      >
+        <h2 class="dialog__title" id="dialog-project-title">New project</h2>
+        <p class="dialog__description" id="dialog-project-desc">
+          You become its owner. You can invite people once it exists.
+        </p>
+        <form class="dialog__form" novalidate>
+          <div class="field">
+            <label class="field__label" for="project-name-input">Name</label>
+            <input class="input" id="project-name-input" placeholder="Website Redesign" />
+            <p class="field__hint">1–255 characters, unique among your projects.</p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="project-desc-input">Description</label>
+            <textarea
+              class="textarea"
+              id="project-desc-input"
+              placeholder="What is this project for?"
+            ></textarea>
+            <p class="field__hint">Optional, up to 5000 characters.</p>
+          </div>
+          <div class="dialog__footer">
+            <button class="btn btn--outline" type="button" data-close-dialog>Cancel</button>
+            <button class="btn btn--primary" type="button" data-close-dialog>Create project</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="dialog-backdrop" id="dialog-task" hidden>
+      <div
+        class="dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dialog-task-title"
+        aria-describedby="dialog-task-desc"
+      >
+        <h2 class="dialog__title" id="dialog-task-title">New task</h2>
+        <p class="dialog__description" id="dialog-task-desc">
+          Any member can create a task — there is no role gate on tasks.
+        </p>
+        <form class="dialog__form" novalidate>
+          <div class="field">
+            <label class="field__label" for="task-title-input">Title</label>
+            <input class="input" id="task-title-input" placeholder="Migrate the marketing site" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="task-desc-input">Description</label>
+            <textarea class="textarea" id="task-desc-input"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label class="field__label" for="task-status-input">Status</label>
+              <select class="select" id="task-status-input">
+                <option>To Do</option>
+                <option>In Progress</option>
+                <option>Done</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field__label" for="task-priority-input">Priority</label>
+              <select class="select" id="task-priority-input">
+                <option>Low</option>
+                <option selected>Medium</option>
+                <option>High</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label class="field__label" for="task-assignee-input">Assignee</label>
+              <select class="select" id="task-assignee-input" data-assignee-options>
+                <option>Unassigned</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field__label" for="task-due-input">Due date</label>
+              <input class="input" id="task-due-input" type="date" />
+            </div>
+          </div>
+          <div class="dialog__footer">
+            <button class="btn btn--outline" type="button" data-close-dialog>Cancel</button>
+            <button class="btn btn--primary" type="button" data-close-dialog>Create task</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="dialog-backdrop" id="dialog-delete" hidden>
+      <div
+        class="dialog"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="dialog-delete-title"
+        aria-describedby="dialog-delete-desc"
+      >
+        <h2 class="dialog__title" id="dialog-delete-title">Delete this task?</h2>
+        <p class="dialog__description" id="dialog-delete-desc">
+          <strong id="dialog-delete-name">Audit the colour contrast of every badge</strong>
+          will be removed from the list, along with its comments. This cannot be undone.
+        </p>
+        <div class="dialog__footer">
+          <button class="btn btn--outline" type="button" data-close-dialog>Cancel</button>
+          <button class="btn btn--destructive" type="button" data-close-dialog>Delete task</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="prototype-bar">
+      <a href="index.html">← All screens</a>
+      <span class="prototype-bar__sep" aria-hidden="true"></span>
+      <span class="muted text-sm">Pick a project on the left to load its tasks</span>
+    </div>
+
+    <script src="assets/prototype.js"></script>
+  </body>
+</html>

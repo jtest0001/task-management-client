@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Taskly design prototype</title>
+    <link rel="stylesheet" href="assets/tokens.css" />
+    <link rel="stylesheet" href="assets/app.css" />
+  </head>
+  <body>
+    <main class="doc">
+      <span class="wordmark wordmark--lg">
+        <span class="wordmark__mark" aria-hidden="true">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M2.5 8.5l3 3 8-8" />
+          </svg>
+        </span>
+        Taskly
+      </span>
+
+      <h1>Design prototype</h1>
+      <p>
+        Static HTML — no framework, no build step, no network calls. It is the visual spec the React app
+        builds against: every value comes from
+        <code>assets/tokens.css</code>, which is mirrored as oklch variables in <code>src/index.css</code>.
+        Colour direction is taken from <code>moodboard/</code>.
+      </p>
+
+      <h2>Screens</h2>
+      <div class="screen-grid">
+        <a class="screen-link" href="login.html">
+          <span class="screen-link__title">Sign in</span>
+          <span class="screen-link__body">
+            Split card, form left and illustration right. Toggle the generic-401 error state.
+          </span>
+        </a>
+        <a class="screen-link" href="register.html">
+          <span class="screen-link__title">Create account</span>
+          <span class="screen-link__body">
+            Same frame, with the password hint and the duplicate-email 409 on the field.
+          </span>
+        </a>
+        <a class="screen-link" href="app.html">
+          <span class="screen-link__title">Workspace</span>
+          <span class="screen-link__body">
+            Projects on the left; pick one and its tasks fill the right. Tabs, task detail with comments,
+            members, labels, dialogs and every list state.
+          </span>
+        </a>
+      </div>
+
+      <h2>Palette</h2>
+      <p>
+        The moodboard's teal is <code>#24C0B8</code>. At 2.26:1 against white it cannot carry text or a focus
+        ring, so it stays the brand accent — washes, the active-project marker, the illustration — while
+        <code>--primary</code> is the deeper <code>#0A7F78</code> (4.86:1).
+      </p>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="swatch__chip" style="background: var(--teal-50)"></div>
+          <div class="swatch__meta">
+            <div class="swatch__name">teal-50</div>
+            <div class="swatch__hex">#F0FBFA</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch__chip" style="background: var(--teal-100)"></div>
+          <div class="swatch__meta">
+            <div class="swatch__name">teal-100</div>
+            <div class="swatch__hex">#D9F5F2</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch__chip" style="background: var(--teal-200)"></div>
+          <div class="swatch__meta">
+            <div class="swatch__name">teal-200</div>
+            <div class="swatch__hex">#A9E9E3</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch__chip" style="background: var(--teal-300)"></div>
+          <div class="swatch__meta">
+            <div class="swatch__name">teal-300</div>
+            <div class="swatch__hex">#6FD8D0</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch__chip" style="background: var(--teal-400)"></div>
+          <div class="swatch__meta">
+            <div class="swatch__name">teal-400 · brand</div>
+            <div class="swatch__hex">#24C0B8</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch__chip" style="background: var(--teal-500)"></div>
+          <div class="swatch__meta">
+            <div class="swatch__name">teal-500</div>
+            <div class="swatch__hex">#12A79F</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch__chip" style="background: var(--teal-600)"></div>
+          <div class="swatch__meta">
+            <div class="swatch__name">teal-600 · primary</div>
+            <div class="swatch__hex">#0A7F78</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch__chip" style="background: var(--teal-700)"></div>
+          <div class="swatch__meta">
+            <div class="swatch__name">teal-700</div>
+            <div class="swatch__hex">#08655F</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch__chip" style="background: var(--teal-900)"></div>
+          <div class="swatch__meta">
+            <div class="swatch__name">teal-900</div>
+            <div class="swatch__hex">#0C4B47</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch__chip" style="background: var(--teal-950)"></div>
+          <div class="swatch__meta">
+            <div class="swatch__name">teal-950</div>
+            <div class="swatch__hex">#06302E</div>
+          </div>
+        </div>
+      </div>
+
+      <h2>Status and priority</h2>
+      <p>
+        Three statuses, not the moodboard's four — the API enum is
+        <code>TODO | IN_PROGRESS | DONE</code>. Colour never carries the meaning alone; every chip keeps its
+        label.
+      </p>
+      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem">
+        <span class="status-chip status-chip--todo">To Do</span>
+        <span class="status-chip status-chip--progress">In Progress</span>
+        <span class="status-chip status-chip--done">Done</span>
+        <span class="badge badge--priority-low">Low</span>
+        <span class="badge badge--priority-medium">Medium</span>
+        <span class="badge badge--priority-high">High</span>
+      </div>
+    </main>
+  </body>
+</html>

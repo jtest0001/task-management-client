@@ -42,9 +42,24 @@ export function CredentialsForm({
       onSubmit={handleSubmit((values) => onSubmit(values, form))}
     >
       {errors.root ? (
-        <p role="alert" className="text-destructive rounded-md border border-current/25 px-3 py-2 text-sm">
-          {errors.root.message}
-        </p>
+        <div
+          role="alert"
+          className="text-destructive border-destructive/25 bg-destructive/5 flex items-start gap-2 rounded-md border px-3 py-2 text-sm"
+        >
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            aria-hidden="true"
+            className="mt-0.5 size-4 shrink-0"
+          >
+            <circle cx="8" cy="8" r="6.5" />
+            <path d="M8 5v3.5M8 11h.01" />
+          </svg>
+          <span>{errors.root.message}</span>
+        </div>
       ) : null}
 
       <div className="flex flex-col gap-2">
@@ -90,8 +105,21 @@ export function CredentialsForm({
         ) : null}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" size="lg" disabled={isSubmitting} className="mt-1 w-full">
         {isSubmitting ? "Please wait…" : submitLabel}
+        {isSubmitting ? null : (
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 8h9M8.5 4.5L12 8l-3.5 3.5" />
+          </svg>
+        )}
       </Button>
     </form>
   )
