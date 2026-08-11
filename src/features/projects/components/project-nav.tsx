@@ -82,9 +82,7 @@ export function ProjectNav() {
   return (
     <nav aria-label="Projects" className="flex h-full flex-col gap-4 px-3 py-4">
       <div className="flex items-center justify-between gap-2 px-2">
-        <span className="text-muted-foreground text-xs font-semibold tracking-[0.06em] uppercase">
-          Projects
-        </span>
+        <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Projects</span>
         <CreateProjectDialog
           trigger={
             <Button variant="ghost" size="icon-sm" aria-label="New project">

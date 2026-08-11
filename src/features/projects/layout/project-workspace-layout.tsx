@@ -10,6 +10,7 @@ import { useProject, useProjects } from "@/features/projects/api/projects.querie
 import { canManageProject } from "@/features/projects/lib/capabilities"
 import { cn } from "@/lib/utils"
 import type { ProjectSummary } from "@/types/api"
+import { CreateTaskDialog } from "@/features/tasks/components/create-task-dialog"
 
 function WorkspaceHeaderSkeleton() {
   return (
@@ -44,12 +45,11 @@ function WorkspaceHeader({ project }: { project: ProjectSummary }) {
         </p>
       </div>
 
-      {canManageProject(project.role) ? (
-        <div className="flex shrink-0 items-center gap-2">
-          <EditProjectDialog project={project} />
-          <DeleteProjectDialog project={project} />
-        </div>
-      ) : null}
+      <div className="flex shrink-0 items-center gap-2">
+        {canManageProject(project.role) && <EditProjectDialog project={project} />}
+        {canManageProject(project.role) && <DeleteProjectDialog project={project} />}
+        <CreateTaskDialog projectId={project.id} />
+      </div>
     </header>
   )
 }

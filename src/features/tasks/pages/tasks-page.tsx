@@ -1,4 +1,4 @@
-import { useParams, useSearchParams } from "react-router"
+import { Outlet, useParams, useSearchParams } from "react-router"
 
 import { ErrorState } from "@/components/error-state"
 import { useMembers } from "@/features/members/api/members.queries"
@@ -58,12 +58,16 @@ export function TasksPage() {
             members={members}
             membersPending={membersPending}
             isPlaceholderData={isPlaceholderData}
+            search={searchParams.toString()}
+            projectId={projectId ?? ""}
             onClearFilters={clearFilters}
             onBackToFirstPage={() => goToPage(1)}
           />
           {tasks.data.length > 0 && <TaskPagination pagination={tasks.pagination} onPageChange={goToPage} />}
         </>
       ) : null}
+
+      <Outlet />
     </div>
   )
 }

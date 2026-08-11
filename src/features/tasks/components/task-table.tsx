@@ -1,10 +1,12 @@
 import { useMemo } from "react"
 import { Clock } from "lucide-react"
+import { Link } from "react-router"
 
 import { EmptyState } from "@/components/empty-state"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TaskPriorityBadge, TaskStatusChip } from "@/features/tasks/components/task-badges"
+import { CreateTaskDialog } from "@/features/tasks/components/create-task-dialog"
 import type { Task } from "@/features/tasks/api/tasks.api"
 import type { Member } from "@/features/members/api/members.api"
 import { hasActiveFilters, type TaskListQuery } from "@/features/tasks/lib/task-list-params"
@@ -81,6 +83,8 @@ interface TaskTableProps {
   members: Member[] | undefined
   membersPending: boolean
   isPlaceholderData: boolean
+  search: string
+  projectId: string
   onClearFilters: () => void
   onBackToFirstPage: () => void
 }
@@ -92,6 +96,8 @@ export function TaskTable({
   members,
   membersPending,
   isPlaceholderData,
+  search,
+  projectId,
   onClearFilters,
   onBackToFirstPage
 }: TaskTableProps) {
@@ -124,7 +130,13 @@ export function TaskTable({
       )
     }
 
-    return <EmptyState title="No tasks yet" description="Any project member can create a task." />
+    return (
+      <EmptyState
+        title="No tasks yet"
+        description="Any project member can create a task."
+        action={<CreateTaskDialog projectId={projectId} />}
+      />
+    )
   }
 
   return (
@@ -140,7 +152,7 @@ export function TaskTable({
               <th
                 key={col}
                 scope="col"
-                className="text-muted-foreground border-border whitespace-nowrap border-t px-3 py-2.5 text-left text-sm font-medium"
+                className="text-muted-foreground border-border border-t px-3 py-2.5 text-left text-sm font-medium whitespace-nowrap"
               >
                 {col}
               </th>
@@ -149,11 +161,17 @@ export function TaskTable({
         </thead>
         <tbody>
           {tasks.map((task) => (
-            <tr key={task.id} className="hover:bg-muted/50">
+            <tr key={task.id} className="hover:bg-muted/50 relative">
               <td className="border-border border-t px-3 py-2.5 font-medium">
-                <span className={cn(task.status === "DONE" && "text-muted-foreground line-through")}>
+                <Link
+                  to={{ pathname: task.id, search }}
+                  className={cn(
+                    "focus-visible:ring-ring rounded-sm outline-none after:absolute after:inset-0 focus-visible:ring-2",
+                    task.status === "DONE" && "text-muted-foreground line-through"
+                  )}
+                >
                   {task.title}
-                </span>
+                </Link>
               </td>
               <td className="border-border border-t px-3 py-2.5">
                 <TaskStatusChip status={task.status} />
@@ -162,7 +180,11 @@ export function TaskTable({
                 <TaskPriorityBadge priority={task.priority} />
               </td>
               <td className="border-border border-t px-3 py-2.5">
-                <AssigneeCell assigneeId={task.assigneeId} members={members} membersPending={membersPending} />
+                <AssigneeCell
+                  assigneeId={task.assigneeId}
+                  members={members}
+                  membersPending={membersPending}
+                />
               </td>
               <td className="border-border border-t px-3 py-2.5">
                 <DueDateCell dueDate={task.dueDate} status={task.status} />

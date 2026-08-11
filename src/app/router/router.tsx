@@ -9,6 +9,7 @@ import { LoginPage } from "@/features/auth/pages/login-page"
 import { RegisterPage } from "@/features/auth/pages/register-page"
 import { ProjectWorkspaceLayout } from "@/features/projects/layout/project-workspace-layout"
 import { ProjectsPage } from "@/features/projects/pages/projects-page"
+import { TaskDetailPanel } from "@/features/tasks/components/task-detail-panel"
 import { TasksPage } from "@/features/tasks/pages/tasks-page"
 
 /**
@@ -30,11 +31,9 @@ export function AppRoutes() {
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:projectId" element={<ProjectWorkspaceLayout />}>
             <Route index element={<Navigate to="tasks" replace />} />
-            <Route path="tasks" element={<TasksPage />} />
-            <Route
-              path="tasks/:taskId"
-              element={<PlaceholderPage title="Task detail" phase="Phase 5" />}
-            />
+            <Route path="tasks" element={<TasksPage />}>
+              <Route path=":taskId" element={<TaskDetailPanel />} />
+            </Route>
             <Route path="members" element={<PlaceholderPage title="Members" phase="Phase 7" />} />
             <Route path="labels" element={<PlaceholderPage title="Labels" phase="Phase 8" />} />
           </Route>

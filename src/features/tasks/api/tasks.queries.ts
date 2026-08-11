@@ -12,3 +12,7 @@ export function useTaskList(projectId: string, query: TaskListQuery) {
     placeholderData: keepPreviousData
   })
 }
+
+export function useTask(taskId: string) {
+  return useQuery({ queryKey: taskKeys.detail(taskId), queryFn: () => tasksApi.get(taskId) })
+}

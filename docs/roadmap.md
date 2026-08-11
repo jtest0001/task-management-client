@@ -20,7 +20,7 @@ Update the status table as phases land.
 | 2 — Authentication     | Register, login, logout, boot restore, guards    | ✅ Done     |
 | 3 — Projects           | List, create, workspace shell, role plumbing     | ✅ Done     |
 | 4 — Task list          | Filters, search, sort, pagination, URL state     | ✅ Done     |
-| 5 — Task CRUD + detail | Create, detail route, edit, delete               | ⬜ Next     |
+| 5 — Task CRUD + detail | Create, detail route, edit, delete               | ✅ Done     |
 | 6 — Comments           | List, create, edit/delete own                    | ⬜          |
 | 7 — Members            | List, add by email, promote/demote, remove       | ⬜          |
 | 8 — Labels + TaskLabel | Definitions CRUD, attach/detach — **needs BE-4** | ⬜          |
@@ -137,6 +137,47 @@ mobile width without widening the page.
 - **No "Unassigned" filter option** (Decision 6). `assigneeId` is uuid-validated server-side, so
   the API cannot express "assignee is null" — tracked as **BE-9** below.
 
+### Phase 5 — Task CRUD + detail
+
+`features/tasks/` gained `api/tasks.mutations.ts` (`useCreateTask`, `useUpdateTask`,
+`useDeleteTask`), `schemas/task.schemas.ts`, and
+`components/{task-form-dialog,create-task-dialog,edit-task-dialog,delete-task-dialog,task-detail-panel}.tsx`.
+`tasks.api.ts` gained `get`/`create`/`update`/`remove` and `CreateTaskInput`/`UpdateTaskInput`;
+`tasks.keys.ts` gained `listsForProject`/`details`/`detail`; `tasks.queries.ts` gained
+`useTask`. The detail route (`/projects/:projectId/tasks/:taskId`) nests under `tasks` in
+`router.tsx` and renders inside `TasksPage`'s `<Outlet />` via `components/ui/sheet.tsx`
+(added via `npx shadcn@latest add sheet`). Task rows in `task-table.tsx` are now links
+(stretched-link pattern: an `after:absolute after:inset-0` anchor in the title cell) carrying
+the current search string. `components/date-picker.tsx` (shared, `components/ui/{calendar,popover}.tsx`
+via shadcn) replaces the raw `<input type="date">` in `task-form-dialog.tsx` with a button +
+`Popover` + `Calendar`, wired through RHF's `Controller` since it isn't a native input; it
+carries its own "Clear" action. The detail panel's content (eyebrow label, description-first
+ordering, a `dt`/`dl` detail grid, inline Edit/Delete buttons, a disabled Comments placeholder
+composer) was resynced against `design/app.html`'s `.panel` after a review found it had drifted
+from the prototype — see `renderPanel()` in `design/assets/prototype.js` for the reference
+markup. Tests: `features/tasks/tasks-crud.test.tsx`.
+
+Verified against the running backend as `alice@example.com`: create appends a row without
+navigating into it; deep link renders the panel with joined assignee email; editing sends only
+the changed field(s), `dueDate` as a full ISO datetime, a cleared date as `null`, and a cleared
+assignee as `null`; an unchanged submit fires no request; delete returns 204, closes the panel,
+and lands back on the list with its search string intact; a bogus task id renders "This task no
+longer exists" distinctly from the generic error state. `typecheck`, `lint`, `test -- --run`
+(67 tests), and `build` all clean.
+
+**Deviations from the plan:**
+
+- **Backend fix, not a frontend workaround, for unassigning a task.** The open question in
+  `phase-5-task-crud.md` §7 found that `create-task.schema.ts`'s `assigneeId: z.uuid().optional()`
+  has no `.nullable()`, so `PATCH { assigneeId: null }` failed validation — the same shape of gap
+  as BE-9. Rather than permanently hiding the "Unassigned" option once a task has an assignee,
+  `update-task.schema.ts` was changed to `assigneeId: z.uuid().nullable().optional()` (update
+  only — create still has no reason to accept an explicit null), with `UpdateTaskData.assigneeId`
+  in `task.types.ts` widened to match. Left uncommitted in the backend repo for review, same as
+  the Phase 0.5 fixes.
+- **Row navigation is a stretched link inside the title cell**, not a per-row click handler —
+  keeps the table keyboard- and screen-reader-correct without a non-semantic `<div onClick>`.
+
 ---
 
 ## Locked decisions
@@ -169,24 +210,6 @@ Carry these forward; they are consequences of the real API, not preferences.
 ---
 
 ## ⬜ Remaining phases
-
-### Phase 5 — Task CRUD + detail
-
-**Build:** create dialog, detail route `/projects/:projectId/tasks/:taskId` (side panel on
-desktop, still URL-addressable), edit, delete with confirmation.
-
-**Contract notes**
-
-- `PATCH /tasks/:taskId` is partial and **rejects an empty object** — send only changed fields.
-- `dueDate`: `toApiDate` on write, `null` to clear, omit to leave alone.
-- Assigning a non-member → **400** with a field-usable message.
-- Any member may create/update/delete any task — no role gate in the UI either.
-
-**Cache:** update → `setQueryData` on the detail + invalidate the project's task lists (status,
-priority, assignee, dueDate and title all affect filtering and sorting membership). Delete →
-invalidate lists, remove the detail, navigate back to the list.
-
----
 
 ### Phase 6 — Comments
 
@@ -272,7 +295,7 @@ first genuinely good candidate for optimistic updates, with rollback.
 | BE-5 | No `assignee` projection on tasks    | Worked around   |
 | BE-7 | `GET /projects` is unpaginated       | Not yet         |
 | BE-8 | No change-password endpoint          | Backlog — no account/settings UI yet |
-| BE-9 | Cannot filter tasks for "unassigned" — `assigneeId` is uuid-validated, no way to express null | **Phase 4 on** |
+| BE-9 | Cannot filter tasks for "unassigned" — `assigneeId` is uuid-validated, no way to express null. `PATCH` itself was fixed in Phase 5 (`update-task.schema.ts` now accepts `assigneeId: null`); this row is only the *query*-side gap, since `task-query.schema.ts` still validates `assigneeId` as a plain uuid | **Phase 4 on** |
 | —    | `search` matches `title` only        | Phase 4 copy    |
 | —    | `refresh.schema.ts` is now dead code | Cleanup         |
 
