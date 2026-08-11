@@ -50,7 +50,19 @@ unless noted. All errors are JSON.
 | `PATCH /projects/:projectId`  | **OWNER only** (ADMIN gets 403)                                                                                                                  |
 | `DELETE /projects/:projectId` | **OWNER only**, soft delete → **204**                                                                                                            |
 
-Duplicate `(name, ownerId)` among non-deleted projects → **409**.
+Duplicate `(name, ownerId)` among non-deleted projects → **409**, from a raw partial index
+(`Project_name_ownerId_key … WHERE deletedAt IS NULL`), not a Prisma `@@unique` — it arrives as a
+bare `{ message }` with **no `fieldErrors`**, so map it onto `name` manually, rename included.
+
+`name` 1–255 trimmed, `description` ≤5000 optional trimmed. `PATCH` body is `.partial().refine(…)`
+and **rejects `{}`** — send only changed fields.
+
+`POST` / `PATCH /projects` return a **raw `Project` row** (adds `updatedAt`, `deletedAt`) — a
+different shape from the 5-field `project` nested inside each `GET /projects` membership row. Type
+them as two distinct interfaces; don't reuse one for both.
+
+`findByUserId` (backing `GET /projects`) has **no `orderBy`** — row order is undefined. Sort
+client-side.
 
 **`GET /projects` is how the UI knows the current user's role in a project** — it is the only
 endpoint that returns it without an extra request.

@@ -8,16 +8,16 @@ import { ProjectNav } from "@/features/projects/components/project-nav"
 export function AppShell() {
   return (
     <div className="flex min-h-svh flex-col">
-      <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b px-4">
+      <header className="bg-background flex h-14 shrink-0 items-center justify-between gap-4 border-b px-4">
         <Logo />
         <UserMenu />
       </header>
 
       <div className="flex flex-1 flex-col md:flex-row">
-        <aside className="w-full shrink-0 md:w-64 md:border-r">
+        <aside className="bg-background w-full shrink-0 md:w-64 md:border-r">
           <ProjectNav />
         </aside>
-        <main className="min-w-0 flex-1 p-6">
+        <main className="min-w-0 flex-1 py-6">
           <Outlet />
         </main>
       </div>

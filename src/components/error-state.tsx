@@ -17,7 +17,7 @@ export function ErrorState({ error, onRetry }: ErrorStateProps) {
   return (
     <div
       role="alert"
-      className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-6 py-14 text-center"
+      className="bg-card flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-6 py-14 text-center"
     >
       <p className="text-sm font-medium">Something went wrong</p>
       <p className="text-muted-foreground max-w-sm text-sm">{apiError.message}</p>

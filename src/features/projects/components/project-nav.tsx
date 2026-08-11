@@ -1,8 +1,12 @@
-import { NavLink } from "react-router"
+import { PlusIcon } from "lucide-react"
+import { NavLink, useParams } from "react-router"
 
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useProjects } from "@/features/projects/api/projects.queries"
+import { useProject, useProjects } from "@/features/projects/api/projects.queries"
+import { CreateProjectDialog } from "@/features/projects/components/create-project-dialog"
+import { InviteTeammatesCard } from "@/features/projects/components/invite-teammates-card"
+import { canAddMembersToProject } from "@/features/projects/lib/capabilities"
 import { toApiError } from "@/lib/api/errors"
 import { cn } from "@/lib/utils"
 import type { ProjectSummary } from "@/types/api"
@@ -44,7 +48,8 @@ function ProjectNavList({ projects }: { projects: ProjectSummary[] }) {
       {projects.map((project) => (
         <li key={project.id}>
           <NavLink
-            to={`/projects/${project.id}/tasks`}
+            to={`/projects/${project.id}`}
+            end={false}
             className={({ isActive }) =>
               cn(
                 "text-foreground hover:bg-muted relative flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm",
@@ -70,17 +75,32 @@ function ProjectNavList({ projects }: { projects: ProjectSummary[] }) {
 }
 
 export function ProjectNav() {
+  const { projectId } = useParams()
   const { data: projects, isPending, isError, error, refetch } = useProjects()
+  const { data: selectedProject } = useProject(projectId)
 
   return (
     <nav aria-label="Projects" className="flex h-full flex-col gap-4 px-3 py-4">
-      <span className="text-muted-foreground px-2 text-xs font-semibold tracking-[0.06em] uppercase">
-        Projects
-      </span>
+      <div className="flex items-center justify-between gap-2 px-2">
+        <span className="text-muted-foreground text-xs font-semibold tracking-[0.06em] uppercase">
+          Projects
+        </span>
+        <CreateProjectDialog
+          trigger={
+            <Button variant="ghost" size="icon-sm" aria-label="New project">
+              <PlusIcon />
+            </Button>
+          }
+        />
+      </div>
 
       {isPending && <ProjectNavSkeleton />}
       {isError && <ProjectNavError error={error} onRetry={() => refetch()} />}
       {!isPending && !isError && <ProjectNavList projects={projects} />}
+
+      {selectedProject && canAddMembersToProject(selectedProject.role) && (
+        <InviteTeammatesCard projectId={selectedProject.id} />
+      )}
     </nav>
   )
 }
