@@ -23,3 +23,13 @@ export function useProjects() {
         .sort((a, b) => a.name.localeCompare(b.name))
   })
 }
+
+export function useProject(projectId: string | undefined) {
+  return useQuery({
+    ...projectsQueryOptions,
+    select: (memberships): ProjectSummary | undefined => {
+      const membership = memberships.find((m) => m.projectId === projectId)
+      return membership && { ...membership.project, role: membership.role }
+    }
+  })
+}

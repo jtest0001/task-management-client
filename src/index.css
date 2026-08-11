@@ -22,6 +22,10 @@
  */
 :root {
   --background: oklch(1 0 0);
+  /* Page canvas behind white surfaces (topbar, rail, cards) — design's --canvas / neutral-50,
+     same value as --muted. Kept distinct from --background so `bg-background` on a card still
+     reads as "the white surface", not "the page". */
+  --canvas: oklch(0.9776 0.0021 197.12);
   --foreground: oklch(0.2103 0.0106 185.78); /* #131A19 — 17.65:1 */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.2103 0.0106 185.78);
@@ -117,6 +121,9 @@
  */
 .dark {
   --background: oklch(0.16 0.018 190);
+  /* Dark mode already separates canvas from surface via --background vs --card, so canvas is
+     just --background here — no prototype dark mode exists to mirror. */
+  --canvas: oklch(0.16 0.018 190);
   --foreground: oklch(0.9776 0.0021 197.12);
   --card: oklch(0.22 0.019 190);
   --card-foreground: oklch(0.9776 0.0021 197.12);
@@ -185,6 +192,7 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-canvas: var(--canvas);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -274,7 +282,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-canvas text-foreground;
     letter-spacing: var(--tracking-normal);
   }
 }
@@ -287,4 +295,9 @@
 
 @utility bg-auth-aside {
   background: linear-gradient(170deg, var(--teal-50), var(--teal-100));
+}
+
+/* Rail invite card — same teal wash idea as the auth aside, different angle. */
+@utility bg-invite-card {
+  background: linear-gradient(160deg, var(--teal-50), var(--teal-100));
 }

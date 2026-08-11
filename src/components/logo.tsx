@@ -22,7 +22,7 @@ export function Logo({ size = "default", className }: LogoProps) {
       <span
         aria-hidden
         className={cn(
-          "bg-primary text-primary-foreground grid shrink-0 place-items-center rounded-lg",
+          "bg-primary text-primary-foreground grid shrink-0 place-items-center rounded-[0.5rem]",
           size === "lg" ? "size-9" : "size-7"
         )}
       >

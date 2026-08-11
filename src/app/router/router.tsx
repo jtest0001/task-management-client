@@ -7,6 +7,8 @@ import { RedirectIfAuthenticated } from "@/features/auth/components/redirect-if-
 import { RequireAuth } from "@/features/auth/components/require-auth"
 import { LoginPage } from "@/features/auth/pages/login-page"
 import { RegisterPage } from "@/features/auth/pages/register-page"
+import { ProjectWorkspaceLayout } from "@/features/projects/layout/project-workspace-layout"
+import { ProjectsPage } from "@/features/projects/pages/projects-page"
 
 /**
  * Page URLs are a navigation concern and deliberately do not mirror the REST routes — the
@@ -24,23 +26,17 @@ export function AppRoutes() {
       <Route element={<RequireAuth />}>
         <Route element={<AppShell />}>
           <Route index element={<Navigate to="/projects" replace />} />
-          <Route path="/projects" element={<PlaceholderPage title="Projects" phase="Phase 3" />} />
-          <Route
-            path="/projects/:projectId/tasks"
-            element={<PlaceholderPage title="Tasks" phase="Phase 4" />}
-          />
-          <Route
-            path="/projects/:projectId/tasks/:taskId"
-            element={<PlaceholderPage title="Task detail" phase="Phase 5" />}
-          />
-          <Route
-            path="/projects/:projectId/members"
-            element={<PlaceholderPage title="Members" phase="Phase 7" />}
-          />
-          <Route
-            path="/projects/:projectId/labels"
-            element={<PlaceholderPage title="Labels" phase="Phase 8" />}
-          />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/projects/:projectId" element={<ProjectWorkspaceLayout />}>
+            <Route index element={<Navigate to="tasks" replace />} />
+            <Route path="tasks" element={<PlaceholderPage title="Tasks" phase="Phase 4" />} />
+            <Route
+              path="tasks/:taskId"
+              element={<PlaceholderPage title="Task detail" phase="Phase 5" />}
+            />
+            <Route path="members" element={<PlaceholderPage title="Members" phase="Phase 7" />} />
+            <Route path="labels" element={<PlaceholderPage title="Labels" phase="Phase 8" />} />
+          </Route>
         </Route>
       </Route>
 

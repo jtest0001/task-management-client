@@ -18,8 +18,8 @@ Update the status table as phases land.
 | 0.5 — Backend unblock  | Fix 3 blocking defects + seed                    | ✅ Done     |
 | 1 — Foundation         | Tooling, API client, refresh flow, shell, tests  | ✅ Done     |
 | 2 — Authentication     | Register, login, logout, boot restore, guards    | ✅ Done     |
-| 3 — Projects           | List, create, workspace shell, role plumbing     | ⬜ Next     |
-| 4 — Task list          | Filters, search, sort, pagination, URL state     | ⬜          |
+| 3 — Projects           | List, create, workspace shell, role plumbing     | ✅ Done     |
+| 4 — Task list          | Filters, search, sort, pagination, URL state     | ⬜ Next     |
 | 5 — Task CRUD + detail | Create, detail route, edit, delete               | ⬜          |
 | 6 — Comments           | List, create, edit/delete own                    | ⬜          |
 | 7 — Members            | List, add by email, promote/demote, remove       | ⬜          |
@@ -82,6 +82,31 @@ revoked server-side; register 409 → inline email error; register → auto-logi
 owns the three auth transitions and pages use React Hook Form's `isSubmitting`. Splitting them
 would have created two sources of truth for one state machine.
 
+### Phase 3 — Projects
+
+`features/projects/` — `api/{projects.api,projects.keys,projects.queries,projects.mutations}.ts`,
+`lib/capabilities.ts`, `schemas/project.schemas.ts`, `pages/projects-page.tsx`,
+`layout/project-workspace-layout.tsx`,
+`components/{project-nav,project-tabs,project-form-dialog,create-project-dialog,edit-project-dialog,delete-project-dialog,invite-teammates-card}.tsx`.
+
+The workspace derives its project and role from the `GET /projects` list query (always mounted
+for the sidebar) rather than a `GET /projects/:projectId` call — see
+[`phase-3-projects.md`](./phase-3-projects.md), Decision 1. Deep links cost zero extra requests,
+rename needs no second cache entry, and a project the caller isn't a member of renders a clean
+"not found" without a 403 round-trip.
+
+Verified: `typecheck`, `lint`, `test -- --run`, and `build` all clean.
+
+**Deviations from the original plan:**
+
+- The rename dialog is `edit-project-dialog.tsx` / "Edit Project", not `rename-project-dialog.tsx`
+  / "Rename" — a deliberate naming call made while building, not an oversight.
+- `useProjectRole(projectId)` and the `canManageMembers` / `canManageLabels` /
+  `canChangeMemberRole` capability helpers from the plan were **not** added — nothing in Phase 3
+  calls them yet (Members and Labels UIs don't exist until Phases 7–8). Add each when its phase
+  gives it a real caller; `canManageProject` and `canAddMembersToProject` (used by the invite
+  card) shipped because they already have one.
+
 ---
 
 ## Locked decisions
@@ -114,28 +139,6 @@ Carry these forward; they are consequences of the real API, not preferences.
 ---
 
 ## ⬜ Remaining phases
-
-### Phase 3 — Projects
-
-**Build:** projects list page, create-project dialog, project workspace shell with routed tabs
-(Tasks / Members / Labels), sidebar project list, `useProjectRole(projectId)` selector,
-capability helpers (`canManageProject`, `canManageMembers`, `canManageLabels`,
-`canChangeMemberRole`).
-
-**Contract notes**
-
-- `GET /projects` returns a **bare array of membership rows**, each with `role` and a nested
-  `project`. Map to a view type in the query's `select`.
-- `POST /projects` → 201; duplicate `(name, ownerId)` → **409**.
-- `PATCH` / `DELETE /projects/:id` are **OWNER only** — an ADMIN sees a project they cannot
-  rename. Follow the code, not the original spec wording.
-
-**Cache:** create/update/delete → invalidate `projectKeys.lists()`.
-
-**States:** empty ("No projects yet"), loading skeleton, error. `ethan@example.com` has no
-projects — use it to check the empty state.
-
----
 
 ### Phase 4 — Task list
 
@@ -259,6 +262,7 @@ first genuinely good candidate for optimistic updates, with rollback.
 | BE-4 | A task's labels cannot be read back  | **Phase 8**     |
 | BE-5 | No `assignee` projection on tasks    | Worked around   |
 | BE-7 | `GET /projects` is unpaginated       | Not yet         |
+| BE-8 | No change-password endpoint          | Backlog — no account/settings UI yet |
 | —    | `search` matches `title` only        | Phase 4 copy    |
 | —    | `refresh.schema.ts` is now dead code | Cleanup         |
 
