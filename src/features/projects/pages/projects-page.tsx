@@ -39,7 +39,9 @@ function ProjectCard({ project }: { project: ProjectSummary }) {
         </span>
       </div>
       {project.description ? (
-        <p className="text-muted-foreground line-clamp-2 text-sm">{project.description}</p>
+        <p className="text-muted-foreground line-clamp-2 text-sm whitespace-pre-wrap">
+          {project.description}
+        </p>
       ) : (
         <p className="text-muted-foreground text-sm italic">No description</p>
       )}

@@ -27,3 +27,10 @@ const displayFormatter = new Intl.DateTimeFormat(undefined, {
 
 /** `"2026-08-15T00:00:00.000Z"` -> `"Aug 15"`. Rendered in UTC to match the stored date. */
 export const formatDueDate = (iso: string): string => displayFormatter.format(new Date(iso))
+
+/** Compares against the start of today in UTC, consistent with how due dates are stored. */
+export const isOverdue = (iso: string): boolean => {
+  const today = new Date()
+  const startOfTodayUtc = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
+  return new Date(iso).getTime() < startOfTodayUtc
+}

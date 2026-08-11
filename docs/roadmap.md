@@ -19,8 +19,8 @@ Update the status table as phases land.
 | 1 — Foundation         | Tooling, API client, refresh flow, shell, tests  | ✅ Done     |
 | 2 — Authentication     | Register, login, logout, boot restore, guards    | ✅ Done     |
 | 3 — Projects           | List, create, workspace shell, role plumbing     | ✅ Done     |
-| 4 — Task list          | Filters, search, sort, pagination, URL state     | ⬜ Next     |
-| 5 — Task CRUD + detail | Create, detail route, edit, delete               | ⬜          |
+| 4 — Task list          | Filters, search, sort, pagination, URL state     | ✅ Done     |
+| 5 — Task CRUD + detail | Create, detail route, edit, delete               | ⬜ Next     |
 | 6 — Comments           | List, create, edit/delete own                    | ⬜          |
 | 7 — Members            | List, add by email, promote/demote, remove       | ⬜          |
 | 8 — Labels + TaskLabel | Definitions CRUD, attach/detach — **needs BE-4** | ⬜          |
@@ -90,10 +90,9 @@ would have created two sources of truth for one state machine.
 `components/{project-nav,project-tabs,project-form-dialog,create-project-dialog,edit-project-dialog,delete-project-dialog,invite-teammates-card}.tsx`.
 
 The workspace derives its project and role from the `GET /projects` list query (always mounted
-for the sidebar) rather than a `GET /projects/:projectId` call — see
-[`phase-3-projects.md`](./phase-3-projects.md), Decision 1. Deep links cost zero extra requests,
-rename needs no second cache entry, and a project the caller isn't a member of renders a clean
-"not found" without a 403 round-trip.
+for the sidebar) rather than a `GET /projects/:projectId` call — see Locked decision 1 below.
+Deep links cost zero extra requests, rename needs no second cache entry, and a project the
+caller isn't a member of renders a clean "not found" without a 403 round-trip.
 
 Verified: `typecheck`, `lint`, `test -- --run`, and `build` all clean.
 
@@ -106,6 +105,37 @@ Verified: `typecheck`, `lint`, `test -- --run`, and `build` all clean.
   calls them yet (Members and Labels UIs don't exist until Phases 7–8). Add each when its phase
   gives it a real caller; `canManageProject` and `canAddMembersToProject` (used by the invite
   card) shipped because they already have one.
+
+### Phase 4 — Task list
+
+`features/tasks/` — `api/{tasks.api,tasks.keys,tasks.queries}.ts`,
+`lib/{task-list-params,task-list-params.test}.ts`, `pages/tasks-page.tsx`,
+`components/{task-toolbar,task-table,task-badges,task-pagination}.tsx`, `tasks.test.tsx`.
+`features/members/` — `api/{members.api,members.keys,members.queries}.ts` (the read-only query
+the assignee column and filter need). `components/native-select.tsx`. `lib/utils/date.ts` gained
+`isOverdue`.
+
+The URL is the single source of truth (`parseTaskListParams` / `toTaskListSearchParams`); the
+search box is the one uncontrolled exception, debounced ~300ms into `setSearchParams`. Any filter
+or sort change resets to page 1 and `replace`s history; paging `push`es. `keepPreviousData` keeps
+rows visible (dimmed, `aria-busy`) during a refetch.
+
+Verified: `typecheck`, `lint`, `test -- --run` (59 tests, incl. 18 param-parser cases and 7
+router-level integration tests), and `build` all clean. Manually verified against the running
+backend as `alice@example.com`: filter/search/sort/page each write the expected param and fire
+one request per committed change; a copied URL reloads to the same view; hand-edited garbage
+params (`page=0&status=BOGUS&assigneeId=nope`) fall back to defaults with no 400; `page=999`
+renders "That page is empty" distinctly from "No tasks yet"; the table scrolls horizontally at
+mobile width without widening the page.
+
+**Deviations from the plan, both already recorded in
+[`phase-4-task-list.md`](./phase-4-task-list.md):**
+
+- **Flat table, not the prototype's status groups** (Decision 4). Grouping fights server-side
+  pagination — a group's count would be its count on the current page, which reads as a
+  project-wide total and would be a lie. Status grouping is deferred to Phase 11's board view.
+- **No "Unassigned" filter option** (Decision 6). `assigneeId` is uuid-validated server-side, so
+  the API cannot express "assignee is null" — tracked as **BE-9** below.
 
 ---
 
@@ -139,27 +169,6 @@ Carry these forward; they are consequences of the real API, not preferences.
 ---
 
 ## ⬜ Remaining phases
-
-### Phase 4 — Task list
-
-**Build:** the primary workspace. Toolbar (search, status, priority, assignee, sort), task rows,
-pagination.
-
-**Contract notes**
-
-- `GET /projects/:projectId/tasks` → `{ data, pagination: { page, limit, totalPages, total } }`.
-- Query params: `page`, `limit` (≤100), `status`, `priority`, `assigneeId`, `search`, `sortBy`
-  ∈ `createdAt|dueDate|priority|title`, `sortOrder`. Search matches **title only** — say so in
-  the placeholder.
-- Rows need the members query to resolve `assigneeId` → email.
-
-**URL state is the single source of truth.** Parse `useSearchParams` into a typed query object;
-the query key derives from it. No mirrored `useState`.
-
-**States:** distinguish "no tasks yet → create one" from "no tasks match these filters → clear
-filters". Keep previous data visible during refetch.
-
----
 
 ### Phase 5 — Task CRUD + detail
 
@@ -263,6 +272,7 @@ first genuinely good candidate for optimistic updates, with rollback.
 | BE-5 | No `assignee` projection on tasks    | Worked around   |
 | BE-7 | `GET /projects` is unpaginated       | Not yet         |
 | BE-8 | No change-password endpoint          | Backlog — no account/settings UI yet |
+| BE-9 | Cannot filter tasks for "unassigned" — `assigneeId` is uuid-validated, no way to express null | **Phase 4 on** |
 | —    | `search` matches `title` only        | Phase 4 copy    |
 | —    | `refresh.schema.ts` is now dead code | Cleanup         |
 

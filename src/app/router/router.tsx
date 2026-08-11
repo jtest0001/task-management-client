@@ -9,6 +9,7 @@ import { LoginPage } from "@/features/auth/pages/login-page"
 import { RegisterPage } from "@/features/auth/pages/register-page"
 import { ProjectWorkspaceLayout } from "@/features/projects/layout/project-workspace-layout"
 import { ProjectsPage } from "@/features/projects/pages/projects-page"
+import { TasksPage } from "@/features/tasks/pages/tasks-page"
 
 /**
  * Page URLs are a navigation concern and deliberately do not mirror the REST routes — the
@@ -29,7 +30,7 @@ export function AppRoutes() {
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:projectId" element={<ProjectWorkspaceLayout />}>
             <Route index element={<Navigate to="tasks" replace />} />
-            <Route path="tasks" element={<PlaceholderPage title="Tasks" phase="Phase 4" />} />
+            <Route path="tasks" element={<TasksPage />} />
             <Route
               path="tasks/:taskId"
               element={<PlaceholderPage title="Task detail" phase="Phase 5" />}

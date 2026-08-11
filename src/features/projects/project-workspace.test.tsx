@@ -24,9 +24,14 @@ const membership = (role: "OWNER" | "ADMIN") => ({
   }
 })
 
+// Every test here lands on the Tasks tab, which fires its own list + members requests.
 const authed = (...handlers: ReturnType<typeof http.get>[]) => [
   http.post(`${API}/auth/refresh`, () => HttpResponse.json({ accessToken: "access-token" })),
   http.get(`${API}/auth/me`, () => HttpResponse.json(USER)),
+  http.get(`${API}/projects/:projectId/tasks`, () =>
+    HttpResponse.json({ data: [], pagination: { page: 1, limit: 20, totalPages: 1, total: 0 } })
+  ),
+  http.get(`${API}/projects/:projectId/members`, () => HttpResponse.json({ data: [] })),
   ...handlers
 ]
 

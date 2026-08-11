@@ -38,9 +38,15 @@ const MEMBER_OF = {
   }
 }
 
+// The "create project" test navigates into the new project's Tasks tab, which fires its own
+// list + members requests.
 const authed = (projectsHandler: ReturnType<typeof http.get>) => [
   http.post(`${API}/auth/refresh`, () => HttpResponse.json({ accessToken: "access-token" })),
   http.get(`${API}/auth/me`, () => HttpResponse.json(USER)),
+  http.get(`${API}/projects/:projectId/tasks`, () =>
+    HttpResponse.json({ data: [], pagination: { page: 1, limit: 20, totalPages: 1, total: 0 } })
+  ),
+  http.get(`${API}/projects/:projectId/members`, () => HttpResponse.json({ data: [] })),
   projectsHandler
 ]
 
