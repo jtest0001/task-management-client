@@ -9,8 +9,14 @@ import { canAddMembersToProject } from "@/features/projects/lib/capabilities"
 
 export function MembersPage() {
   const { projectId } = useParams<{ projectId: string }>()
-  const project = useProject(projectId).data
-  const { data: members, isPending, isError, error, refetch } = useMembers(projectId)
+  const {
+    data: project,
+    isPending: isProjectPending,
+    isError: isProjectError,
+    error: projectError,
+    refetch: refetchProject
+  } = useProject(projectId)
+  const { data: members, isPending: isMembersPending, isError, error, refetch } = useMembers(projectId)
 
   const role = project?.role
 
@@ -27,21 +33,27 @@ export function MembersPage() {
 
       {projectId && canAddMembersToProject(role) && <AddMemberForm projectId={projectId} />}
 
-      {isPending && <MembersTableSkeleton />}
-      {isError && <ErrorState error={error} onRetry={() => refetch()} />}
-      {!isPending && !isError && members && projectId && role ? (
+      {isProjectError ? (
+        <ErrorState error={projectError} onRetry={() => refetchProject()} />
+      ) : (
         <>
-          <MembersTable projectId={projectId} role={role} members={members} />
-          {members.length === 1 &&
-            (canAddMembersToProject(role) ? (
-              <p className="text-muted-foreground text-sm">
-                You're the only member here — add teammates above.
-              </p>
-            ) : (
-              <p className="text-muted-foreground text-sm">You're the only member here.</p>
-            ))}
+          {(isProjectPending || isMembersPending) && <MembersTableSkeleton />}
+          {isError && <ErrorState error={error} onRetry={() => refetch()} />}
+          {!isProjectPending && !isMembersPending && !isError && members && projectId && role ? (
+            <>
+              <MembersTable projectId={projectId} role={role} members={members} />
+              {members.length === 1 &&
+                (canAddMembersToProject(role) ? (
+                  <p className="text-muted-foreground text-sm">
+                    You're the only member here — add teammates above.
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground text-sm">You're the only member here.</p>
+                ))}
+            </>
+          ) : null}
         </>
-      ) : null}
+      )}
     </div>
   )
 }
