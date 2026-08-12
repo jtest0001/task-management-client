@@ -1,4 +1,4 @@
-import type { TaskPriority, TaskStatus } from "@/types/api"
+import type { TaskPriority, TaskStatus } from "@/features/tasks/api/tasks.api"
 
 export type TaskSortBy = "createdAt" | "dueDate" | "priority" | "title"
 export type TaskSortOrder = "asc" | "desc"

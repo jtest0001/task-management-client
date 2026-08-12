@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { useUpdateProject } from "@/features/projects/api/projects.mutations"
 import { ProjectFormDialog } from "@/features/projects/components/project-form-dialog"
 import type { CreateProjectInput } from "@/features/projects/api/projects.api"
-import type { ProjectSummary } from "@/types/api"
+import type { ProjectSummary } from "@/features/projects/api/projects.api"
 
 export function EditProjectDialog({ project }: { project: ProjectSummary }) {
   const updateProject = useUpdateProject(project.id)

@@ -23,7 +23,7 @@ Update the status table as phases land.
 | 5 — Task CRUD + detail | Create, detail route, edit, delete               | ✅ Done     |
 | 6 — Comments           | List, create, edit/delete own                    | ✅ Done     |
 | 7 — Members            | List, add by email, promote/demote, remove       | ✅ Done     |
-| 8 — Labels + TaskLabel | Definitions CRUD, attach/detach — **needs BE-4** | ⬜          |
+| 8 — Labels + TaskLabel | Definitions CRUD, attach/detach                  | ✅ Done     |
 | 9 — UX polish          | States, a11y, responsive, keyboard               | ⬜          |
 | 10 — Test coverage     | Fill gaps, add E2E for critical flows            | ⬜          |
 | 11 — Kanban (optional) | Board view, drag/drop, optimistic status         | ⬜ Deferred |
@@ -269,12 +269,69 @@ no remove buttons. `typecheck`, `lint`, `test -- --run` (107 tests), and `build`
 - **No `table__col-action` utility class.** The design prototype defines one for the fixed-width
   action column, but it was never ported into `src/index.css` and `task-table.tsx` doesn't use it
   either — the members table follows that precedent instead of introducing a dead class.
-- **Post-review polish, requested after the first pass shipped:** the add-member form is wrapped
-  in the same `bg-card`/border/shadow container as `task-toolbar.tsx` (was a bare form), stacks to
-  full width below `sm`, and caps at `sm:max-w-sm` on wider screens instead of stretching the
-  whole row. `member-role-select.tsx` wraps `NativeSelect` in a sized container `div` rather than
-  passing a width straight to the `<select>` — passing it directly left `NativeSelect`'s chevron
-  (positioned against its own full-width wrapper) stranded far right of the actual select box.
+- **Post-review polish, requested after the first pass shipped, later reverted in Phase 8's
+  cross-page format pass:** the add-member form was briefly wrapped in a `bg-card`/border/shadow
+  container. A later review against `design/assets/prototype.js`'s `renderMembers()` found the
+  spec's `.inline-form` is bare — no card — so both `add-member-form.tsx` and Phase 8's
+  `create-label-form.tsx` dropped the wrapper to match. The form still stacks to full width below
+  `sm` and caps at `sm:max-w-sm` on wider screens. `member-role-select.tsx` wraps `NativeSelect` in
+  a sized container `div` rather than passing a width straight to the `<select>` — passing it
+  directly left `NativeSelect`'s chevron (positioned against its own full-width wrapper) stranded
+  far right of the actual select box.
+
+### Phase 8 — Labels + TaskLabel
+
+**BE-4 resolved via a new endpoint, not the roadmap's `include`.** Re-verified against backend
+source before scoping: no repository method on `Task` uses `include`, and the task-label routes
+had no read path. Rather than `include: { labels: { include: { label: true } } }` on every task
+select (which would reshape the `Task` type Phases 4–5 already depend on, and would force every
+attach/detach to invalidate task lists and details), the backend gained a sub-resource endpoint —
+`GET /tasks/:taskId/labels`, mirroring Phase 6's `GET /tasks/:taskId/comments` pattern. Surgical
+addition across `label.repository.ts` (`findByTaskId`), `task-label.service.ts`
+(`getTaskLabels`), `task-label.controller.ts`, `task-label.routes.ts` — left **uncommitted on
+`dev`** for review, same as the earlier backend fixes. Full details and the three-reason
+rationale are in [`phase-8-labels.md`](./phase-8-labels.md) §1. BE-4 is **reframed, not closed**:
+the read path exists and the task detail panel uses it; list-level label display (a label column
+or filter) is still unbuilt because nothing at that altitude reads labels yet.
+
+New `features/labels/` — `api/{labels.api,labels.keys,labels.queries,labels.mutations}.ts`
+(`useLabels`, `useTaskLabels`, `useCreateLabel`, `useUpdateLabel`, `useDeleteLabel`,
+`useAttachLabel`, `useDetachLabel`), `schemas/label.schemas.ts`, `pages/labels-page.tsx`,
+`components/{label-list,label-row,create-label-form,edit-label-dialog,delete-label-dialog,color-field,task-labels-section}.tsx`,
+`labels.test.tsx`. `Label` lives in `src/types/api.ts` (cross-feature: the definitions screen and
+the task panel both need it). `features/projects/lib/capabilities.ts` gained `canManageLabels`
+(OWNER/ADMIN — attach/detach has no role gate, so nothing else needed one). `router.tsx` swapped
+the Phase 8 placeholder for the real page; `task-detail-panel.tsx` renders
+`<TaskLabelsSection taskId={taskId} projectId={projectId} />` mounted alongside the task and
+comments fetches (not nested inside `task ? … : null`), avoiding the Phase 6 waterfall lesson a
+second time.
+
+The colour field (`color-field.tsx`) pairs a native `<input type="color">` swatch with the hex
+text input, both bound to one React Hook Form field via `Controller` — the swatch alone is opaque
+to a screen reader, and Zod validates the hex regardless of which control wrote it. The attach
+picker on the task panel is a `Popover` of real `<button aria-pressed>` rows (a locked decision
+from scoping — not the vendored `DropdownMenu`, despite `dropdown-menu.tsx` already existing),
+so one control both attaches and detaches. Cache invalidation follows §6 of the phase doc: create
+touches only the project's label list; **update and delete also invalidate every `taskLabelKeys`
+entry**, since a rename/recolour or a cascading hard delete can change any open task's chips;
+attach/detach touch only that task's label list. A 409 on attach (the cache is stale, not a real
+conflict) invalidates and surfaces nothing to the user, matching idempotent detach's "no
+pre-check" philosophy.
+
+Verified against the running backend as `alice@example.com` (OWNER): created, edited (partial
+`PATCH`, no-op resubmit sent no request) and hard-deleted a label with the cascade copy shown;
+attach/detach round-tripped from the task panel's popover, including a label that had been
+attached via seed data; duplicate-name 409 (create and rename) landed on the `name` field with no
+`fieldErrors` in the response. `typecheck`, `lint`, `test -- --run` (124 tests), and `build` all
+clean.
+
+**Deviations from the plan:**
+
+- **A colour picker was added to the prototype's text-only field**, per the phase doc's own
+  scoping — the design spec shows a plain text input, but a picker plus the same text field
+  satisfies both usability and the "colour is never the only path in" rule.
+- **A Delete control per label row**, which `design/assets/prototype.js`'s `renderLabels()` does
+  not show — added because Phase 8 ships full CRUD, not just create/edit.
 
 ---
 
@@ -309,25 +366,6 @@ Carry these forward; they are consequences of the real API, not preferences.
 
 ## ⬜ Remaining phases
 
-### Phase 8 — Labels + TaskLabel
-
-**⚠️ Blocked on BE-4 for display.** Labels can be attached and detached but a task's labels
-cannot be read back — absent from list and detail responses, and there is no
-`GET /tasks/:taskId/labels`. Resolve this before building label rendering; the fix is
-`include: { labels: { include: { label: true } } }` on the task selects. Attach/detach
-themselves work (fixed in Phase 0.5).
-
-**Build:** labels screen (view for all, CRUD for OWNER/ADMIN), attach/detach from task detail.
-
-**Contract notes**
-
-- Colour must match `^#[0-9A-Fa-f]{6}$`. Never rely on colour alone — always show the name.
-- Label delete is a **hard delete** and cascades to `TaskLabel`. Confirm destructively.
-- Duplicate name → **409**; duplicate attach → **409**; detach is idempotent, so no pre-check.
-- MEMBER: read-only on definitions, but **may attach/detach**. Two different empty states.
-
----
-
 ### Phase 9 — UX polish
 
 Sweep every screen for: loading / empty / error states, toast discipline (not for everything),
@@ -355,7 +393,7 @@ first genuinely good candidate for optimistic updates, with rollback.
 
 | Id    | Gap                                             | When it matters |
 | ----- | ----------------------------------------------- | --------------- |
-| BE-4  | A task's labels cannot be read back             | **Phase 8**     |
+| BE-4  | ~~A task's labels cannot be read back~~ — fixed via `GET /tasks/:taskId/labels` | List-level display still unbuilt |
 | BE-5  | No `assignee` projection on tasks               | Worked around   |
 | BE-7  | `GET /projects` is unpaginated                  | Not yet         |
 | BE-8  | No change-password endpoint                     | Backlog         |

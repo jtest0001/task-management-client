@@ -6,8 +6,9 @@
  *
  *   - a task carries `assigneeId` and nothing else about the person, so every row you see with
  *     an avatar is a client-side join against that project's members;
- *   - a task carries no labels at all (backend gap BE-4), which is why the task table has no
- *     label column and the Labels tab says so out loud;
+ *   - a task's labels come from their own sub-resource, `GET /tasks/:taskId/labels` (Phase 8),
+ *     not from the task row — the task table still has no label column, since nothing at that
+ *     altitude reads labels yet; only the detail panel does;
  *   - `role` arrives per project on the projects list, so the rail is also the source of the
  *     capability checks below.
  */
@@ -350,6 +351,11 @@ const LABELS = {
   ],
   p3: [{ id: "l7", name: "Docs", color: "#12A79F" }],
   p4: []
+}
+
+/** `GET /tasks/:taskId/labels` — task id -> attached label ids, `name asc` on the real endpoint. */
+const TASK_LABELS = {
+  t1: ["l2", "l4"]
 }
 
 /* ============================================================ capability helpers
@@ -854,11 +860,15 @@ function renderLabels() {
                <span class="badge__dot" style="background: ${esc(label.color)}"
                      aria-hidden="true"></span>
                <span class="label-row__name">${esc(label.name)}</span>
-               <span class="muted text-xs">${esc(label.color)}</span>
+               <span class="label-row__hex muted text-xs">${esc(label.color)}</span>
                ${
                  editable
-                   ? `<button class="btn btn--ghost btn--sm" type="button"
-                              aria-label="Edit ${esc(label.name)}">Edit</button>`
+                   ? `<div class="label-row__actions">
+                        <button class="btn btn--ghost btn--sm" type="button"
+                                aria-label="Edit ${esc(label.name)}">Edit</button>
+                        <button class="btn btn--ghost btn--sm" type="button"
+                                aria-label="Delete ${esc(label.name)}">Delete</button>
+                      </div>`
                    : ""
                }
              </div>`
@@ -881,7 +891,11 @@ function renderLabels() {
          </div>
          <div class="field" style="flex: 0 0 9rem">
            <label class="field__label" for="label-color">Colour</label>
-           <input class="input" id="label-color" value="#0A7F78" aria-describedby="label-hint" />
+           <div style="display: flex; align-items: center; gap: 0.5rem">
+             <label class="visually-hidden" for="label-color-swatch">Color swatch</label>
+             <input type="color" id="label-color-swatch" class="input color-swatch" value="#0A7F78" />
+             <input class="input" id="label-color" value="#0A7F78" aria-describedby="label-hint" />
+           </div>
          </div>
          <button class="btn btn--primary" type="button">Create label</button>
          <p class="inline-form__hint" id="label-hint">
@@ -895,16 +909,6 @@ function renderLabels() {
     <div class="stack">
       ${createForm}
       ${list}
-      <div class="alert alert--info">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
-             stroke-linecap="round" aria-hidden="true">
-          <circle cx="8" cy="8" r="6.5" /><path d="M8 7.5v3.5M8 5h.01" />
-        </svg>
-        <span>
-          Attaching labels to tasks is not shown here: task responses do not return their labels
-          yet (backend gap BE-4), so the task table has no label column.
-        </span>
-      </div>
     </div>`
 }
 
@@ -924,6 +928,9 @@ function renderPanel() {
   const comments = COMMENTS[task.id] ?? []
   const priority = PRIORITY_META[task.priority]
   const status = STATUS_META[task.status]
+  const projectLabels = LABELS[state.projectId] ?? []
+  const attachedIds = new Set(TASK_LABELS[task.id] ?? [])
+  const taskLabels = projectLabels.filter((label) => attachedIds.has(label.id))
 
   panel.hidden = false
   panel.innerHTML = `
@@ -971,6 +978,36 @@ function renderPanel() {
         <button class="btn btn--ghost btn--sm" type="button" data-open-dialog="delete"
                 data-task-name="${esc(task.title)}">Delete</button>
       </div>
+
+      <section>
+        <h3 class="section-title">Labels</h3>
+        <div class="chip-row">
+          ${
+            taskLabels.length
+              ? taskLabels
+                  .map(
+                    (label) => `
+                <span class="chip">
+                  <span class="badge__dot" style="background: ${esc(label.color)}" aria-hidden="true"></span>
+                  ${esc(label.name)}
+                  <button class="chip__remove" type="button" aria-label="Remove ${esc(label.name)}">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"
+                         stroke-linecap="round" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6" /></svg>
+                  </button>
+                </span>`
+                  )
+                  .join("")
+              : projectLabels.length
+                ? `<p class="muted text-sm">No labels on this task yet.</p>`
+                : `<p class="muted text-sm">This project has no labels yet.</p>`
+          }
+          ${
+            projectLabels.length
+              ? `<button class="btn btn--outline btn--sm" type="button">Add label</button>`
+              : ""
+          }
+        </div>
+      </section>
 
       <section>
         <h3 class="section-title">Comments (${comments.length})</h3>

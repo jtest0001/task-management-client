@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { useNavigate } from "react-router"
 import { toast } from "sonner"
 
 import {
@@ -14,19 +13,18 @@ import {
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { useDeleteProject } from "@/features/projects/api/projects.mutations"
+import { useDeleteLabel } from "@/features/labels/api/labels.mutations"
 import { toApiError } from "@/lib/api/errors"
-import type { ProjectSummary } from "@/features/projects/api/projects.api"
+import type { Label } from "@/features/labels/api/labels.api"
 
-export function DeleteProjectDialog({ project }: { project: ProjectSummary }) {
+export function DeleteLabelDialog({ label, projectId }: { label: Label; projectId: string }) {
   const [open, setOpen] = useState(false)
-  const navigate = useNavigate()
-  const deleteProject = useDeleteProject(project.id)
+  const deleteLabel = useDeleteLabel(label.id, projectId)
 
   const handleDelete = async () => {
     try {
-      await deleteProject.mutateAsync()
-      navigate("/projects", { replace: true })
+      await deleteLabel.mutateAsync()
+      setOpen(false)
     } catch (error) {
       setOpen(false)
       toast.error(toApiError(error).message)
@@ -36,29 +34,29 @@ export function DeleteProjectDialog({ project }: { project: ProjectSummary }) {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="text-muted-foreground">
-          Delete project
+        <Button variant="ghost" size="sm" className="text-muted-foreground" aria-label={`Delete ${label.name}`}>
+          Delete
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete “{project.name}”?</AlertDialogTitle>
+          <AlertDialogTitle>Delete “{label.name}”?</AlertDialogTitle>
           <AlertDialogDescription>
-            This removes the project for every member, along with its tasks, comments and labels. This cannot
-            be undone.
+            This is a hard delete, not a soft one — it removes the label from every task that has it,
+            immediately and everywhere. This cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
-            disabled={deleteProject.isPending}
+            disabled={deleteLabel.isPending}
             onClick={(event) => {
               event.preventDefault()
               handleDelete()
             }}
           >
-            {deleteProject.isPending ? "Deleting…" : "Delete project"}
+            {deleteLabel.isPending ? "Deleting…" : "Delete label"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

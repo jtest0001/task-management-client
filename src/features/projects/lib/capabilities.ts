@@ -12,3 +12,6 @@ export const canChangeMemberRole = (actor: Role, target: ProjectRole) => actor =
 /** DELETE — OWNER removes ADMIN+MEMBER, ADMIN removes MEMBER, OWNER is never removable. */
 export const canRemoveMember = (actor: Role, target: ProjectRole) =>
   target !== "OWNER" && (actor === "OWNER" || (actor === "ADMIN" && target === "MEMBER"))
+
+/** POST/PATCH/DELETE /projects/:id/labels — OWNER/ADMIN only. Attach/detach has no role gate. */
+export const canManageLabels = (role: Role) => role === "OWNER" || role === "ADMIN"

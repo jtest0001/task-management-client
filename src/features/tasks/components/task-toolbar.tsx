@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { Member } from "@/features/members/api/members.api"
 import type { TaskListQuery, TaskSortBy, TaskSortOrder } from "@/features/tasks/lib/task-list-params"
-import type { TaskPriority, TaskStatus } from "@/types/api"
+import type { TaskPriority, TaskStatus } from "@/features/tasks/api/tasks.api"
 
 const SEARCH_DEBOUNCE_MS = 300
 
@@ -62,8 +62,8 @@ export function TaskToolbar({ query, members, membersPending, onFilterChange }: 
   const sortValue = `${query.sortBy}:${query.sortOrder}`
 
   return (
-    <div className="border-border bg-card flex flex-col gap-2 rounded-xl border p-3 shadow-xs">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-col gap-2">
+      <div className="border-border bg-card flex flex-wrap items-center gap-2 rounded-xl border p-3 shadow-xs">
         <div className="relative min-w-48 flex-1 basis-64">
           <Label htmlFor="task-search" className="sr-only">
             Search tasks by title
@@ -73,7 +73,7 @@ export function TaskToolbar({ query, members, membersPending, onFilterChange }: 
             id="task-search"
             ref={searchInputRef}
             type="search"
-            placeholder="Search by title…"
+            placeholder="Search task titles…"
             defaultValue={query.search ?? ""}
             className="pl-8"
             onChange={(e) => handleSearchChange(e.target.value)}
@@ -126,7 +126,7 @@ export function TaskToolbar({ query, members, membersPending, onFilterChange }: 
             value={query.assigneeId ?? ""}
             onChange={(e) => onFilterChange({ assigneeId: e.target.value || undefined })}
           >
-            <option value="">Any assignee</option>
+            <option value="">Anyone</option>
             {members?.map((member) => (
               <option key={member.user.id} value={member.user.id}>
                 {member.user.email}
@@ -156,7 +156,9 @@ export function TaskToolbar({ query, members, membersPending, onFilterChange }: 
         </div>
       </div>
 
-      <p className="text-muted-foreground text-xs">Search matches the task title only.</p>
+      <p className="text-muted-foreground text-xs">
+        Search matches task titles only, and every filter lives in the URL — this view is shareable.
+      </p>
     </div>
   )
 }

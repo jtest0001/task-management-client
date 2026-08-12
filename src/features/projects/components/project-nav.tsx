@@ -9,7 +9,7 @@ import { InviteTeammatesCard } from "@/features/projects/components/invite-teamm
 import { canAddMembersToProject } from "@/features/projects/lib/capabilities"
 import { toApiError } from "@/lib/api/errors"
 import { cn } from "@/lib/utils"
-import type { ProjectSummary } from "@/types/api"
+import type { ProjectSummary } from "@/features/projects/api/projects.api"
 
 /**
  * The sidebar's project list. Mounted for the whole signed-in session — see

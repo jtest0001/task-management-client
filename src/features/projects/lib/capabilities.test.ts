@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 import {
   canAddMembersToProject,
   canChangeMemberRole,
+  canManageLabels,
   canManageProject,
   canRemoveMember
 } from "@/features/projects/lib/capabilities"
@@ -56,5 +57,16 @@ describe("canRemoveMember", () => {
     [undefined, "MEMBER", false]
   ] as const)("actor %s, target %s -> %s", (actor, target, expected) => {
     expect(canRemoveMember(actor, target)).toBe(expected)
+  })
+})
+
+describe("canManageLabels", () => {
+  it.each([
+    ["OWNER", true],
+    ["ADMIN", true],
+    ["MEMBER", false],
+    [undefined, false]
+  ] as const)("role %s -> %s", (role, expected) => {
+    expect(canManageLabels(role)).toBe(expected)
   })
 })

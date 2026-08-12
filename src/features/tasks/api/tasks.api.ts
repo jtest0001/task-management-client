@@ -1,6 +1,9 @@
 import { apiClient } from "@/lib/api/client"
 import { type TaskListQuery } from "@/features/tasks/lib/task-list-params"
-import type { Paginated, TaskPriority, TaskStatus } from "@/types/api"
+import type { Paginated } from "@/types/api"
+
+export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE"
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH"
 
 /**
  * The full task row. No `assignee` object and no `labels` — join `assigneeId` against the

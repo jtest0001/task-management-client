@@ -2,11 +2,11 @@ import { Navigate, Route, Routes } from "react-router"
 
 import { AppShell } from "@/app/layout/app-shell"
 import { NotFoundPage } from "@/app/router/not-found-page"
-import { PlaceholderPage } from "@/app/router/placeholder-page"
 import { RedirectIfAuthenticated } from "@/features/auth/components/redirect-if-authenticated"
 import { RequireAuth } from "@/features/auth/components/require-auth"
 import { LoginPage } from "@/features/auth/pages/login-page"
 import { RegisterPage } from "@/features/auth/pages/register-page"
+import { LabelsPage } from "@/features/labels/pages/labels-page"
 import { MembersPage } from "@/features/members/pages/members-page"
 import { ProjectWorkspaceLayout } from "@/features/projects/layout/project-workspace-layout"
 import { ProjectsPage } from "@/features/projects/pages/projects-page"
@@ -36,7 +36,7 @@ export function AppRoutes() {
               <Route path=":taskId" element={<TaskDetailPanel />} />
             </Route>
             <Route path="members" element={<MembersPage />} />
-            <Route path="labels" element={<PlaceholderPage title="Labels" phase="Phase 8" />} />
+            <Route path="labels" element={<LabelsPage />} />
           </Route>
         </Route>
       </Route>

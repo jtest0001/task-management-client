@@ -22,14 +22,9 @@ export function MembersPage() {
 
   return (
     <div className="flex flex-col gap-4 px-6">
-      <div className="flex flex-col gap-1">
-        <h2 className="text-lg font-semibold tracking-tight">Members</h2>
-        {members ? (
-          <p className="text-muted-foreground text-sm">
-            {members.length} {members.length === 1 ? "member" : "members"}
-          </p>
-        ) : null}
-      </div>
+      {/* The active tab already says "Members" — this is a landmark for screen readers, not a
+          visible heading. */}
+      <h2 className="sr-only">Members</h2>
 
       {projectId && canAddMembersToProject(role) && <AddMemberForm projectId={projectId} />}
 

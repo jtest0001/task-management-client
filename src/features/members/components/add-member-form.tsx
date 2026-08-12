@@ -47,11 +47,7 @@ export function AddMemberForm({ projectId }: { projectId: string }) {
   }
 
   return (
-    <form
-      noValidate
-      className="border-border bg-card flex flex-col gap-1.5 rounded-xl border p-3 shadow-xs"
-      onSubmit={handleSubmit(submit)}
-    >
+    <form noValidate className="flex flex-col gap-1.5" onSubmit={handleSubmit(submit)}>
       {errors.root ? (
         <p role="alert" className="text-destructive text-sm">
           {errors.root.message}
@@ -65,6 +61,7 @@ export function AddMemberForm({ projectId }: { projectId: string }) {
             id={emailId}
             type="email"
             placeholder="teammate@example.com"
+            className="bg-background"
             aria-invalid={Boolean(errors.email)}
             aria-describedby={errors.email ? errorId : hintId}
             {...register("email")}

@@ -1,5 +1,14 @@
 import { apiClient } from "@/lib/api/client"
-import type { ProjectListItem, ProjectRole } from "@/types/api"
+import type { ProjectRole } from "@/types/api"
+
+/** The 5-field select nested in `GET /projects` — not a whole `Project` row. */
+export interface ProjectListItem {
+  id: string
+  name: string
+  description: string | null
+  ownerId: string
+  createdAt: string
+}
 
 /** A membership row from `GET /projects` — a bare array, one row per project the caller is in. */
 export interface ProjectMembership {
@@ -15,6 +24,9 @@ export interface Project extends ProjectListItem {
   updatedAt: string
   deletedAt: string | null
 }
+
+/** Flattened view of a `GET /projects` row: the project plus the caller's role in it. */
+export type ProjectSummary = ProjectListItem & { role: ProjectRole }
 
 export interface CreateProjectInput {
   name: string

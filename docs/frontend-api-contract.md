@@ -77,7 +77,8 @@ endpoint that returns it without an extra request.
 | `PATCH /tasks/:taskId`            | **200** bare `Task`; partial, rejects `{}`                         |
 | `DELETE /tasks/:taskId`           | **204**, soft delete                                               |
 
-Query: `page` (≥1, default 1), `limit` (≥1 ≤100, default 20), `status`, `priority`,
+Query: `page` (≥1, default 1), `limit` (≥1 ≤100, default **5** — changed from 20 in backend
+commit `d4c51a5`), `status`, `priority`,
 `assigneeId` (uuid), `search` (≤255, blank→ignored, case-insensitive `contains` on **title
 only**), `sortBy` ∈ `createdAt|dueDate|priority|title` (default `createdAt`), `sortOrder` ∈
 `asc|desc` (default `desc`). Ordering is deterministic (tiebreak on `id`, `dueDate` nulls last).
@@ -133,22 +134,33 @@ Projection includes `author: { id, email }` — unlike tasks.
 | `PATCH /labels/:labelId`           | partial; OWNER/ADMIN only                                |
 | `DELETE /labels/:labelId`          | **hard delete**, cascades `TaskLabel`; OWNER/ADMIN only  |
 
-Unique `(projectId, name)` → duplicate name is **409**. All members may _view_.
+Unique `(projectId, name)` → duplicate name is **409**, with no `fieldErrors` (map onto `name` by
+hand). All members may _view_. The wire shape is the full row — `{ id, name, color, projectId,
+createdAt, updatedAt }` — so `Label` carries timestamps the UI never renders, same rule Phase 4
+followed for `Task`.
 
 ## Task ↔ Label
 
-`POST /tasks/:taskId/labels/:labelId` → **201**; `DELETE` → **204** (idempotent).
-Cross-project label → **404**. Duplicate attach → **409**.
+| Endpoint                              | Notes                                                             |
+| -------------------------------------- | ------------------------------------------------------------------ |
+| `GET /tasks/:taskId/labels`            | **bare array** of `Label`, `name asc` — same shape as the project labels endpoint |
+| `POST /tasks/:taskId/labels/:labelId`  | **201**, returns the join row `{ taskId, labelId }` — not a `Label` |
+| `DELETE /tasks/:taskId/labels/:labelId`| **204** (idempotent, no pre-check)                                 |
+
+Cross-project label → **404**. Duplicate attach → **409**. A task the caller cannot see → **404**
+on all three. `GET` reuses `taskRepository.findByTaskIdAndUserId`'s membership guard, same as
+attach/detach — no role gate beyond "can this user see this task".
 
 ## Known gaps
 
-| Id   | Gap                                                                                          | Impact                                                                                                             |
-| ---- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| BE-4 | No way to **read** a task's labels — absent from list and detail, no `GET /tasks/:id/labels` | Blocks displaying labels in Phase 8. Fix: `include: { labels: { include: { label: true } } }` on the task selects. |
+| Id   | Gap                                                | Impact                                                                                     |
+| ---- | --------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| BE-4 | ~~No way to read a task's labels~~ **Fixed in Phase 8** via `GET /tasks/:taskId/labels`, a sub-resource endpoint rather than the roadmap's `include`. List-level label display (e.g. a label column on the task table) is still not built — nothing reads labels at that altitude yet. | None for the detail panel; would need the `include` (or a second call) if a list view ever wants label chips. |
 | BE-5 | No `assignee` projection on tasks                                                            | Worked around by joining client-side against the members query.                                                    |
 | BE-7 | `GET /projects` is unpaginated                                                               | Fine at current scale.                                                                                             |
 | —    | `search` matches `title` only, not `description`                                             | Reflect in UI copy.                                                                                                |
 | —    | `PATCH /projects` is OWNER-only                                                              | An ADMIN can see a project they cannot rename; the UI must follow the code, not the spec.                          |
+| —    | `task-query.schema.ts`'s `limit` default is **5**, not 20 (changed in commit `d4c51a5`)      | Noticed while scoping Phase 8; task list pagination already reflects the live default, this was a stale doc line. |
 
 Fixed during Phase 0 (in the backend repo, uncommitted at time of writing): `findByEmail`
 using `findUnique` on a non-unique column; `POST /auth/refresh` validating a body the browser
