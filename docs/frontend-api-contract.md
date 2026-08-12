@@ -83,6 +83,12 @@ only**), `sortBy` ∈ `createdAt|dueDate|priority|title` (default `createdAt`), 
 `asc|desc` (default `desc`). Ordering is deterministic (tiebreak on `id`, `dueDate` nulls last).
 
 Body: `title` (1–255), `description?` (≤1000), `status?`, `priority?`, `assigneeId?`, `dueDate?`.
+`status ∈ TODO|IN_PROGRESS|DONE` (default `TODO`), `priority ∈ LOW|MEDIUM|HIGH` (default `MEDIUM`).
+
+The list endpoint returns the **full task row**, not a projection: `id, projectId, title,
+description, status, priority, assigneeId, dueDate, createdById, createdAt, updatedAt,
+deletedAt`. `createdById` and `deletedAt` are undocumented above but present on every response —
+type them honestly even where the UI ignores both (Phase 4 does).
 
 - **No `assignee` object and no `labels` in any task response** — only `assigneeId`. Join
   against the members query for display.
