@@ -8,6 +8,7 @@ const PRIORITIES: TaskPriority[] = ["LOW", "MEDIUM", "HIGH"]
 const SORT_BYS: TaskSortBy[] = ["createdAt", "dueDate", "priority", "title"]
 const SORT_ORDERS: TaskSortOrder[] = ["asc", "desc"]
 
+const DEFAULT_PAGE = 1
 const DEFAULT_SORT_BY: TaskSortBy = "createdAt"
 const DEFAULT_SORT_ORDER: TaskSortOrder = "desc"
 
@@ -57,7 +58,7 @@ function parseAssigneeId(raw: string | null): string | undefined {
  */
 export function parseTaskListParams(searchParams: URLSearchParams): TaskListQuery {
   return {
-    page: parsePage(searchParams.get("page")),
+    page: parsePage(searchParams.get("page")) ?? DEFAULT_PAGE,
     limit: parseLimit(searchParams.get("limit")),
     search: parseSearch(searchParams.get("search")),
     status: parseEnum(searchParams.get("status"), STATUSES),
@@ -71,7 +72,7 @@ export function parseTaskListParams(searchParams: URLSearchParams): TaskListQuer
 /** Writes only non-default values, so the unfiltered list is a bare `/projects/:id/tasks`. */
 export function toTaskListSearchParams(query: TaskListQuery): URLSearchParams {
   const params = new URLSearchParams()
-  if (query.page) params.set("page", String(query.page))
+  if (query.page && query.page !== DEFAULT_PAGE) params.set("page", String(query.page))
   if (query.limit) params.set("limit", String(query.limit))
   if (query.search) params.set("search", query.search)
   if (query.status) params.set("status", query.status)

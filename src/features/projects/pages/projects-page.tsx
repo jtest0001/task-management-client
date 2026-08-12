@@ -76,7 +76,7 @@ export function ProjectsPage() {
   const { data: projects, isPending, isError, error, refetch } = useProjects()
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 px-6">
       <h1 className="text-xl font-semibold tracking-tight">Projects</h1>
 
       {isPending && <ProjectsGridSkeleton />}

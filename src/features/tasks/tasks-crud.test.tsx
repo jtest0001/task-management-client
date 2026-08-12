@@ -88,7 +88,7 @@ describe("task create", () => {
     const main = await findMain()
     await within(main).findByText("No tasks yet")
 
-    const [toolbarNewTask] = within(main).getAllByRole("button", { name: "New task" })
+    const [toolbarNewTask] = within(main).getAllByRole("button", { name: "Add task" })
     await user.click(toolbarNewTask)
     const dialog = await screen.findByRole("dialog")
     await user.type(within(dialog).getByLabelText("Title"), "Ship the changelog")

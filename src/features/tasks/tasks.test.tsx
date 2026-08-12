@@ -129,6 +129,42 @@ describe("tasks page", () => {
     })
   })
 
+  it("keeps a filter changed while the search debounce is still pending", async () => {
+    const user = userEvent.setup()
+    let capturedUrl = ""
+    server.use(
+      ...authed(
+        http.get(`${API}/projects/:projectId/tasks`, ({ request }) => {
+          capturedUrl = request.url
+          return HttpResponse.json(paginated([]))
+        })
+      )
+    )
+
+    renderApp(<AppRoutes />, { route: "/projects/p-1/tasks" })
+
+    const main = await findMain()
+    await within(main).findByText("No tasks yet")
+
+    await user.type(within(main).getByLabelText("Search tasks by title"), "contrast")
+    // Committed before the 300ms search debounce elapses.
+    await user.selectOptions(within(main).getByLabelText("Filter by status"), "DONE")
+
+    await waitFor(() => {
+      expect(new URL(capturedUrl).searchParams.get("status")).toBe("DONE")
+    })
+
+    // Once the debounce fires, the status change made in the interim must still be applied.
+    await waitFor(
+      () => {
+        const url = new URL(capturedUrl)
+        expect(url.searchParams.get("search")).toBe("contrast")
+        expect(url.searchParams.get("status")).toBe("DONE")
+      },
+      { timeout: 1000 }
+    )
+  })
+
   it("shows 'No tasks yet' when empty with no filters active", async () => {
     server.use(...authed(http.get(`${API}/projects/:projectId/tasks`, () => HttpResponse.json(paginated([])))))
 

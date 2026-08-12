@@ -33,6 +33,12 @@ export function TaskToolbar({ query, members, membersPending, onFilterChange }: 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const lastCommittedRef = useRef(query.search ?? "")
+  const onFilterChangeRef = useRef(onFilterChange)
+
+  // Work around to get latest snapshot of onFilterChange in the debounced callback, without having to re-create the callback on every render.
+  useEffect(() => {
+    onFilterChangeRef.current = onFilterChange
+  })
 
   useEffect(() => {
     const committed = query.search ?? ""
@@ -49,7 +55,7 @@ export function TaskToolbar({ query, members, membersPending, onFilterChange }: 
     debounceRef.current = setTimeout(() => {
       const trimmed = value.trim()
       lastCommittedRef.current = trimmed
-      onFilterChange({ search: trimmed || undefined })
+      onFilterChangeRef.current({ search: trimmed || undefined })
     }, SEARCH_DEBOUNCE_MS)
   }
 
