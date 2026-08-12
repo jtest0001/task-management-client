@@ -13,7 +13,12 @@
       "Bash(npm create *)",
       "Bash(echo \"EXIT=$?\")",
       "Bash(npx create-vite@9.1.2 --help)",
-      "Bash(npm run format)"
+      "Bash(npm run format)",
+      "Bash(echo \"--- label module ---\")",
+      "Bash(ls 'C:/Users/JE/Desktop/Code playground/Fullstack playground/Practice/task-management-app/task-management-api/src/modules/label')",
+      "Bash(echo \"--- task-label module ---\")",
+      "Bash(ls 'C:/Users/JE/Desktop/Code playground/Fullstack playground/Practice/task-management-app/task-management-api/src/modules/task-label')",
+      "Bash(echo \"--- task module ---\")"
     ]
   }
 }

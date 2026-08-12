@@ -7,6 +7,7 @@ import { RedirectIfAuthenticated } from "@/features/auth/components/redirect-if-
 import { RequireAuth } from "@/features/auth/components/require-auth"
 import { LoginPage } from "@/features/auth/pages/login-page"
 import { RegisterPage } from "@/features/auth/pages/register-page"
+import { MembersPage } from "@/features/members/pages/members-page"
 import { ProjectWorkspaceLayout } from "@/features/projects/layout/project-workspace-layout"
 import { ProjectsPage } from "@/features/projects/pages/projects-page"
 import { TaskDetailPanel } from "@/features/tasks/components/task-detail-panel"
@@ -34,7 +35,7 @@ export function AppRoutes() {
             <Route path="tasks" element={<TasksPage />}>
               <Route path=":taskId" element={<TaskDetailPanel />} />
             </Route>
-            <Route path="members" element={<PlaceholderPage title="Members" phase="Phase 7" />} />
+            <Route path="members" element={<MembersPage />} />
             <Route path="labels" element={<PlaceholderPage title="Labels" phase="Phase 8" />} />
           </Route>
         </Route>

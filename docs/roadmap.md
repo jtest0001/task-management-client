@@ -22,7 +22,7 @@ Update the status table as phases land.
 | 4 — Task list          | Filters, search, sort, pagination, URL state     | ✅ Done     |
 | 5 — Task CRUD + detail | Create, detail route, edit, delete               | ✅ Done     |
 | 6 — Comments           | List, create, edit/delete own                    | ✅ Done     |
-| 7 — Members            | List, add by email, promote/demote, remove       | ⬜          |
+| 7 — Members            | List, add by email, promote/demote, remove       | ✅ Done     |
 | 8 — Labels + TaskLabel | Definitions CRUD, attach/detach — **needs BE-4** | ⬜          |
 | 9 — UX polish          | States, a11y, responsive, keyboard               | ⬜          |
 | 10 — Test coverage     | Fill gaps, add E2E for critical flows            | ⬜          |
@@ -187,7 +187,7 @@ New `features/comments/` — `api/{comments.api,comments.keys,comments.queries,c
 `comments.test.tsx`. `initials()` and its avatar markup were lifted out of
 `task-detail-panel.tsx` into `components/user-avatar.tsx` (`UserAvatar`), now shared by the
 assignee row and every comment author. The task panel's placeholder Comments `<section>` was
-replaced with `<CommentsSection taskId={task.id} />`, and the sheet widened to `sm:max-w-md` to
+replaced with `<CommentsSection taskId={taskId} />`, and the sheet widened to `sm:max-w-md` to
 give the thread and composer more room.
 
 `comments.api.ts` fetches one page at `COMMENTS_PAGE_LIMIT = 100` (no `page` param, no
@@ -235,6 +235,47 @@ reproducing them on a clean `git stash`).
   putting comment data on task rows, and it would bloat every task-list fetch for a detail-only
   need.)
 
+### Phase 7 — Members
+
+`features/members/` gained `api/members.mutations.ts` (`useAddMember`, `useUpdateMemberRole`,
+`useRemoveMember`), `schemas/member.schemas.ts`,
+`components/{add-member-form,members-table,member-role-select,remove-member-dialog}.tsx`,
+`pages/members-page.tsx`, `members.test.tsx`. `members.api.ts` gained `add`/`updateRole`/`remove`.
+`features/projects/lib/capabilities.ts` gained `canChangeMemberRole`/`canRemoveMember` — both take
+the **target's** role alongside the actor's, since every backend rule here is a relation between
+the two — with an exhaustive truth-table test alongside the existing capability tests.
+`router.tsx` swapped the Phase 7 placeholder for the real page.
+
+Ordering is client-side (OWNER → ADMIN → MEMBER, then email ascending) over the unpaginated
+`GET /projects/:id/members` response — the repository itself orders by `joinedAt, userId`, which
+the client sort makes cosmetic. The add-member 404/409 both land on the email field: `AppError`
+subclasses return a bare `{ message }` with no `fieldErrors`, so `add-member-form.tsx` maps by
+HTTP status before falling through to `applyApiErrors` — the same shape of gap Phase 3 hit with
+the project duplicate-name 409.
+
+Verified against the running backend as both `alice@example.com` (OWNER) and
+`diana@example.com` (MEMBER): add/promote/remove all worked for the OWNER; 404 ("No account uses
+that email address.") and 409 ("They're already a member of this project.") both rendered inline
+on the email field; removing a member re-sorted the table and cleared its role/remove controls
+from view; the MEMBER view showed a fully read-only table with no add form, no role selects, and
+no remove buttons. `typecheck`, `lint`, `test -- --run` (107 tests), and `build` all clean.
+
+**Deviations from the plan:**
+
+- **`invite-teammates-card.tsx` had a real routing bug, not a hypothetical one.** Its
+  `navigate()` call built a relative path (`projects/${projectId}/members`, no leading slash),
+  so from inside `/projects/:id/tasks` it resolved relative to the current route instead of to
+  `/projects/:id/members`. Fixed here per the plan's open question on this exact line.
+- **No `table__col-action` utility class.** The design prototype defines one for the fixed-width
+  action column, but it was never ported into `src/index.css` and `task-table.tsx` doesn't use it
+  either — the members table follows that precedent instead of introducing a dead class.
+- **Post-review polish, requested after the first pass shipped:** the add-member form is wrapped
+  in the same `bg-card`/border/shadow container as `task-toolbar.tsx` (was a bare form), stacks to
+  full width below `sm`, and caps at `sm:max-w-sm` on wider screens instead of stretching the
+  whole row. `member-role-select.tsx` wraps `NativeSelect` in a sized container `div` rather than
+  passing a width straight to the `<select>` — passing it directly left `NativeSelect`'s chevron
+  (positioned against its own full-width wrapper) stranded far right of the actual select box.
+
 ---
 
 ## Locked decisions
@@ -267,25 +308,6 @@ Carry these forward; they are consequences of the real API, not preferences.
 ---
 
 ## ⬜ Remaining phases
-
-### Phase 7 — Members
-
-**Build:** members list, add-by-email form, role select, remove with confirmation.
-
-**Contract notes**
-
-- `GET` returns `{ data: [{ role, joinedAt, user: { id, email } }] }` — **no `id` on the member
-  itself**.
-- **`:memberId` in the path is the target's `user.id`.**
-- Add is OWNER/ADMIN only and always joins as `MEMBER` — do not offer a role picker.
-- Role change is **OWNER only**, `ADMIN ↔ MEMBER`; never offer `OWNER`.
-- Removal: OWNER removes ADMIN+MEMBER; ADMIN removes MEMBER only; OWNER never removable.
-- Unknown email → **404**, already a member → **409**. Both belong on the email field.
-
-**Cache — the cross-resource one:** removal unassigns that user's tasks server-side, so
-invalidate **members + task lists + any open task detail**, not just members.
-
----
 
 ### Phase 8 — Labels + TaskLabel
 
@@ -331,15 +353,26 @@ first genuinely good candidate for optimistic updates, with rollback.
 
 ## Backend gaps to track
 
-| Id   | Gap                                  | When it matters |
-| ---- | ------------------------------------ | --------------- |
-| BE-4 | A task's labels cannot be read back  | **Phase 8**     |
-| BE-5 | No `assignee` projection on tasks    | Worked around   |
-| BE-7 | `GET /projects` is unpaginated       | Not yet         |
-| BE-8 | No change-password endpoint          | Backlog — no account/settings UI yet |
-| BE-9 | Cannot filter tasks for "unassigned" — `assigneeId` is uuid-validated, no way to express null. `PATCH` itself was fixed in Phase 5 (`update-task.schema.ts` now accepts `assigneeId: null`); this row is only the *query*-side gap, since `task-query.schema.ts` still validates `assigneeId` as a plain uuid | **Phase 4 on** |
-| —    | `search` matches `title` only        | Phase 4 copy    |
-| —    | `refresh.schema.ts` is now dead code | Cleanup         |
+| Id    | Gap                                             | When it matters |
+| ----- | ----------------------------------------------- | --------------- |
+| BE-4  | A task's labels cannot be read back             | **Phase 8**     |
+| BE-5  | No `assignee` projection on tasks               | Worked around   |
+| BE-7  | `GET /projects` is unpaginated                  | Not yet         |
+| BE-8  | No change-password endpoint                     | Backlog         |
+| BE-9  | Tasks can't be filtered for "unassigned" [^be9] | **Phase 4 on**  |
+| BE-10 | No project ownership transfer [^be10]           | **Phase 7**     |
+| —     | `search` matches `title` only                   | Phase 4 copy    |
+| —     | `refresh.schema.ts` is now dead code            | Cleanup         |
+
+[^be9]:
+    `assigneeId` is uuid-validated, no way to express null. `PATCH` itself was fixed in
+    Phase 5 (`update-task.schema.ts` now accepts `assigneeId: null`); this is only the
+    _query_-side gap, since `task-query.schema.ts` still validates `assigneeId` as a plain uuid.
+
+[^be10]:
+    `project-member.service.ts` throws on any attempt to change or remove the OWNER role,
+    and no other endpoint touches `Project.ownerId`. Confirmed against backend source while
+    scoping Phase 7 — out of scope until a backend endpoint exists.
 
 Do not expand backend payloads speculatively. Change them when a concrete UI need appears.
 
