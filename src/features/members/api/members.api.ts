@@ -10,5 +10,15 @@ export interface Member {
 
 export const membersApi = {
   list: async (projectId: string) =>
-    (await apiClient.get<Wrapped<Member>>(`/projects/${projectId}/members`)).data
+    (await apiClient.get<Wrapped<Member>>(`/projects/${projectId}/members`)).data,
+
+  add: async (projectId: string, email: string) =>
+    (await apiClient.post<Member>(`/projects/${projectId}/members`, { email })).data,
+
+  updateRole: async (projectId: string, userId: string, role: "ADMIN" | "MEMBER") =>
+    (await apiClient.patch<Member>(`/projects/${projectId}/members/${userId}`, { role })).data,
+
+  remove: async (projectId: string, userId: string) => {
+    await apiClient.delete(`/projects/${projectId}/members/${userId}`)
+  }
 }

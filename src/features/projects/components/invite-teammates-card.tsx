@@ -32,7 +32,7 @@ export function InviteTeammatesCard({ projectId }: { projectId: string }) {
       <Button
         type="button"
         className="mt-3 w-full text-sm"
-        onClick={() => navigate(`projects/${projectId}/members`)}
+        onClick={() => navigate(`/projects/${projectId}/members`)}
       >
         Invite a teammate
       </Button>

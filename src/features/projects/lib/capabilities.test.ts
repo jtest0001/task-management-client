@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest"
 
-import { canAddMembersToProject, canManageProject } from "@/features/projects/lib/capabilities"
+import {
+  canAddMembersToProject,
+  canChangeMemberRole,
+  canManageProject,
+  canRemoveMember
+} from "@/features/projects/lib/capabilities"
 
 describe("canManageProject", () => {
   it.each([
@@ -21,5 +26,35 @@ describe("canAddMembersToProject", () => {
     [undefined, false]
   ] as const)("role %s -> %s", (role, expected) => {
     expect(canAddMembersToProject(role)).toBe(expected)
+  })
+})
+
+describe("canChangeMemberRole", () => {
+  it.each([
+    ["OWNER", "ADMIN", true],
+    ["OWNER", "MEMBER", true],
+    ["OWNER", "OWNER", false],
+    ["ADMIN", "ADMIN", false],
+    ["ADMIN", "MEMBER", false],
+    ["MEMBER", "MEMBER", false],
+    [undefined, "MEMBER", false]
+  ] as const)("actor %s, target %s -> %s", (actor, target, expected) => {
+    expect(canChangeMemberRole(actor, target)).toBe(expected)
+  })
+})
+
+describe("canRemoveMember", () => {
+  it.each([
+    ["OWNER", "ADMIN", true],
+    ["OWNER", "MEMBER", true],
+    ["OWNER", "OWNER", false],
+    ["ADMIN", "MEMBER", true],
+    ["ADMIN", "ADMIN", false],
+    ["ADMIN", "OWNER", false],
+    ["MEMBER", "MEMBER", false],
+    ["MEMBER", "OWNER", false],
+    [undefined, "MEMBER", false]
+  ] as const)("actor %s, target %s -> %s", (actor, target, expected) => {
+    expect(canRemoveMember(actor, target)).toBe(expected)
   })
 })
