@@ -55,7 +55,7 @@ export function DeleteProjectDialog({ project }: { project: ProjectSummary }) {
             disabled={deleteProject.isPending}
             onClick={(event) => {
               event.preventDefault()
-              void handleDelete()
+              handleDelete()
             }}
           >
             {deleteProject.isPending ? "Deleting…" : "Delete project"}
