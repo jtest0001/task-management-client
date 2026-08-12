@@ -21,7 +21,7 @@ Update the status table as phases land.
 | 3 — Projects           | List, create, workspace shell, role plumbing     | ✅ Done     |
 | 4 — Task list          | Filters, search, sort, pagination, URL state     | ✅ Done     |
 | 5 — Task CRUD + detail | Create, detail route, edit, delete               | ✅ Done     |
-| 6 — Comments           | List, create, edit/delete own                    | ⬜          |
+| 6 — Comments           | List, create, edit/delete own                    | ✅ Done     |
 | 7 — Members            | List, add by email, promote/demote, remove       | ⬜          |
 | 8 — Labels + TaskLabel | Definitions CRUD, attach/detach — **needs BE-4** | ⬜          |
 | 9 — UX polish          | States, a11y, responsive, keyboard               | ⬜          |
@@ -178,6 +178,63 @@ longer exists" distinctly from the generic error state. `typecheck`, `lint`, `te
 - **Row navigation is a stretched link inside the title cell**, not a per-row click handler —
   keeps the table keyboard- and screen-reader-correct without a non-semantic `<div onClick>`.
 
+### Phase 6 — Comments
+
+New `features/comments/` — `api/{comments.api,comments.keys,comments.queries,comments.mutations}.ts`
+(`useComments`, `useCreateComment`, `useUpdateComment`, `useDeleteComment`),
+`schemas/comment.schemas.ts`,
+`components/{comment-form,comment-item,comments-section,delete-comment-dialog}.tsx`,
+`comments.test.tsx`. `initials()` and its avatar markup were lifted out of
+`task-detail-panel.tsx` into `components/user-avatar.tsx` (`UserAvatar`), now shared by the
+assignee row and every comment author. The task panel's placeholder Comments `<section>` was
+replaced with `<CommentsSection taskId={task.id} />`, and the sheet widened to `sm:max-w-md` to
+give the thread and composer more room.
+
+`comments.api.ts` fetches one page at `COMMENTS_PAGE_LIMIT = 100` (no `page` param, no
+`CommentListQuery` type — one caller, no page state) and never write-throughs the cache; every
+mutation invalidates `commentKeys.list(taskId)` instead, since the cached value is a
+`{ data, pagination }` envelope and splicing it by hand to keep `pagination.total` correct
+isn't worth it for a sub-100ms request. `comments-section.tsx` collapses threads over
+`COMMENTS_COLLAPSED = 5` to the newest comments via `Array.slice` (`useState<boolean>`, no
+fetch), so posting into a 40-comment thread never fetches a page the new comment isn't on.
+
+Tests: `features/comments/comments.test.tsx`, router-level + MSW, mirroring
+`tasks-crud.test.tsx`'s style — ordering, empty state, collapse/expand firing no request,
+create/clear, whitespace-only validation, ownership-gated controls, edit round-trip + no-op
+resubmit + 403 surfaced at form level, and delete leaving the panel open.
+
+Verified against the running backend as `bob@example.com`: posting a comment appears after
+invalidation and clears the composer; editing sends `PATCH { content }` and shows "(edited)";
+deleting removes the row and leaves the task panel open. `typecheck`, `lint`,
+`test -- --run`, and `build` all clean (two pre-existing failures in
+`task-list-params.test.ts` and `tasks-crud.test.tsx`, unrelated to this phase — confirmed by
+reproducing them on a clean `git stash`).
+
+**Deviations from the plan:**
+
+- **`Comment` carries no `taskId`.** §7's open question — read `comment.repository.ts`'s
+  `commentSelect` in the backend instead of assuming the shape: it selects only
+  `id, content, createdAt, updatedAt, author: { id, email }`. No `authorId`, `taskId` or
+  `deletedAt` travel on the wire, so the frontend type says so.
+- **The unchanged-content early return is a courtesy, not a correctness fix.** `content` is a
+  required field on `CommentContentSchema` for both create and update, so there is no `{}` PATCH
+  case to guard against the way task edits do — the early return in `comment-item.tsx` just
+  avoids a pointless round trip.
+- **The "(edited)" marker is safe as written.** `CommentService.updateComment` only ever sets
+  `data.content`; nothing else touches `updatedAt`.
+- **`CommentsSection` mounts alongside the task fetch, not after it.** The plan's wiring (§4)
+  put `<CommentsSection>` inside `task-detail-panel.tsx`'s `{task ? ... : null}` block, which
+  meant `useComments` didn't fire until `useTask` resolved — a render-order waterfall, not a
+  real data dependency, since `taskId` is already known from the route. Post-review fix: the
+  scrollable content region (and `CommentsSection` inside it) now mounts on `!isError && taskId`
+  instead of on `task`, so both `GET /tasks/:id` and `GET /tasks/:id/comments` fire together on
+  open. Task-specific fields inside that region stay gated on `task` itself; the 404 case still
+  hides comments once the task query resolves. Confirmed via network log: both requests now fire
+  back-to-back instead of sequentially. (Embedding comments in the task response — the other way
+  to avoid the waterfall — was considered and rejected: this phase's own scope already rules out
+  putting comment data on task rows, and it would bloat every task-list fetch for a detail-only
+  need.)
+
 ---
 
 ## Locked decisions
@@ -210,21 +267,6 @@ Carry these forward; they are consequences of the real API, not preferences.
 ---
 
 ## ⬜ Remaining phases
-
-### Phase 6 — Comments
-
-**Build:** comment list, composer, edit/delete own inside task detail.
-
-**Contract notes**
-
-- `GET /tasks/:taskId/comments?page&limit` → `{ data, pagination }`, ordered `createdAt asc`.
-- Response includes `author: { id, email }` — no join needed.
-- Only the author may edit or delete; show those controls only when
-  `comment.author.id === me.id`. Backend still enforces it.
-
-**Cache:** any comment mutation → invalidate `commentKeys.list(taskId)`.
-
----
 
 ### Phase 7 — Members
 
