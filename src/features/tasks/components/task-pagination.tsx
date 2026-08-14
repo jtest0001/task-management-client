@@ -26,18 +26,28 @@ export function TaskPagination({ pagination, onPageChange }: TaskPaginationProps
   const { page, limit, total, totalPages } = pagination
   const start = total === 0 ? 0 : (page - 1) * limit + 1
   const end = Math.min(page * limit, total)
+  const isFirstPage = page <= 1
+  const isLastPage = page >= totalPages
 
   return (
     <nav
       aria-label="Task list pages"
       className="text-muted-foreground mt-3 flex flex-wrap items-center gap-2 text-sm"
     >
-      <span>
-        Showing {start}–{end} of {total}
-      </span>
+      {/* Always rendered, even at zero results — this is the one place that announces the
+          count, and it's exactly when an empty list most needs to say so. */}
+      <span aria-live="polite">{total === 0 ? "No tasks found" : `Showing ${start}–${end} of ${total}`}</span>
 
       <div className="ml-auto flex items-center gap-1">
-        <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+        <Button
+          variant="outline"
+          size="sm"
+          aria-disabled={isFirstPage}
+          className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
+          onClick={() => {
+            if (!isFirstPage) onPageChange(page - 1)
+          }}
+        >
           Previous
         </Button>
 
@@ -67,8 +77,11 @@ export function TaskPagination({ pagination, onPageChange }: TaskPaginationProps
         <Button
           variant="outline"
           size="sm"
-          disabled={page >= totalPages}
-          onClick={() => onPageChange(page + 1)}
+          aria-disabled={isLastPage}
+          className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
+          onClick={() => {
+            if (!isLastPage) onPageChange(page + 1)
+          }}
         >
           Next
         </Button>

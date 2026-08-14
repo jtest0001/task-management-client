@@ -1,6 +1,7 @@
 import { ChevronDownIcon, LogOutIcon } from "lucide-react"
 import { useState } from "react"
 import { useNavigate } from "react-router"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -12,6 +13,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/features/auth/auth-context"
+import { toApiError } from "@/lib/api/errors"
 
 export function UserMenu() {
   const { user, logout } = useAuth()
@@ -44,8 +46,13 @@ export function UserMenu() {
           disabled={isSigningOut}
           onSelect={async () => {
             setIsSigningOut(true)
-            await logout()
-            navigate("/login", { replace: true })
+            try {
+              await logout()
+              navigate("/login", { replace: true })
+            } catch (error) {
+              setIsSigningOut(false)
+              toast.error(toApiError(error).message)
+            }
           }}
         >
           <LogOutIcon />

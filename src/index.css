@@ -296,8 +296,3 @@
 @utility bg-auth-aside {
   background: linear-gradient(170deg, var(--teal-50), var(--teal-100));
 }
-
-/* Rail invite card — same teal wash idea as the auth aside, different angle. */
-@utility bg-invite-card {
-  background: linear-gradient(160deg, var(--teal-50), var(--teal-100));
-}

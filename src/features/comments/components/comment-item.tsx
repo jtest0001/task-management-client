@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { UserAvatar } from "@/components/user-avatar"
 import { Button } from "@/components/ui/button"
@@ -16,10 +16,25 @@ const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
   minute: "2-digit"
 })
 
-export function CommentItem({ comment, taskId }: { comment: Comment; taskId: string }) {
+interface CommentItemProps {
+  comment: Comment
+  taskId: string
+  onCommentDeleted?: () => void
+}
+
+export function CommentItem({ comment, taskId, onCommentDeleted }: CommentItemProps) {
   const { user } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const updateComment = useUpdateComment(comment.id, taskId)
+  const editButtonRef = useRef<HTMLButtonElement>(null)
+  const wasEditingRef = useRef(false)
+
+  useEffect(() => {
+    if (wasEditingRef.current && !isEditing) {
+      editButtonRef.current?.focus()
+    }
+    wasEditingRef.current = isEditing
+  }, [isEditing])
 
   const isOwn = user?.id === comment.author.id
   const isEdited = comment.updatedAt !== comment.createdAt
@@ -60,10 +75,16 @@ export function CommentItem({ comment, taskId }: { comment: Comment; taskId: str
         <p className="mt-0.5 text-sm wrap-break-word whitespace-pre-wrap">{comment.content}</p>
         {isOwn ? (
           <div className="mt-1 flex gap-1">
-            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => setIsEditing(true)}>
+            <Button
+              ref={editButtonRef}
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => setIsEditing(true)}
+            >
               Edit
             </Button>
-            <DeleteCommentDialog comment={comment} taskId={taskId} />
+            <DeleteCommentDialog comment={comment} taskId={taskId} onDeleted={onCommentDeleted} />
           </div>
         ) : null}
       </div>

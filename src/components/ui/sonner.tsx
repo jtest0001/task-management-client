@@ -9,6 +9,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme="system"
+      richColors
       className="toaster group"
       icons={{
         success: (
@@ -33,6 +34,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "--normal-text": "var(--popover-foreground)",
           "--normal-border": "var(--border)",
           "--border-radius": "var(--radius)",
+          // Same red family as priority HIGH — the app already uses a soft-bg + AA-text
+          // pairing for that color, so the error toast reuses it instead of inventing one.
+          "--error-bg": "var(--priority-high-soft)",
+          "--error-text": "var(--priority-high)",
+          "--error-border": "color-mix(in oklch, var(--priority-high) 30%, transparent)",
         } as React.CSSProperties
       }
       toastOptions={{

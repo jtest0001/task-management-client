@@ -3,6 +3,7 @@ import { fileURLToPath, URL } from "node:url"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vitest/config"
+import svgr from "vite-plugin-svgr"
 
 // The dev server deliberately does NOT proxy the API.
 //
@@ -12,7 +13,7 @@ import { defineConfig } from "vitest/config"
 // Talking to http://localhost:3000 directly keeps the path (and therefore the cookie) intact;
 // the backend already allows this origin with `credentials: true`.
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), svgr()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url))

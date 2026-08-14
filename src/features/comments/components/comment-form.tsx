@@ -38,6 +38,7 @@ export function CommentForm({
 
   const contentId = useId()
   const errorId = useId()
+  const hintId = useId()
 
   const submit = async (values: CommentFormValues) => {
     try {
@@ -64,7 +65,7 @@ export function CommentForm({
         placeholder="Add a comment…"
         autoFocus={autoFocus}
         aria-invalid={Boolean(errors.content)}
-        aria-describedby={errors.content ? errorId : undefined}
+        aria-describedby={errors.content ? errorId : hintId}
         onKeyDown={(event) => {
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
             event.preventDefault()
@@ -77,7 +78,11 @@ export function CommentForm({
         <p id={errorId} className="text-destructive text-sm">
           {errors.content.message}
         </p>
-      ) : null}
+      ) : (
+        <p id={hintId} className="text-muted-foreground text-xs">
+          ⌘/Ctrl + Enter to submit
+        </p>
+      )}
 
       <div className="flex items-center justify-end gap-2">
         {onCancel ? (

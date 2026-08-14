@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 
-import illustrationTasks from "@/assets/illustration-tasks.svg"
+import tasklyIllustration from "@/assets/taskly-illustration.webp"
 import { Logo } from "@/components/logo"
 
 interface AuthAsideContent {
@@ -44,7 +44,7 @@ export function AuthCard({ title, subtitle, children, footer, aside }: AuthCardP
             <p className="mt-1 text-sm text-teal-800">{aside.body}</p>
           </div>
 
-          <img className="mt-auto w-full" src={illustrationTasks} alt="" />
+          <img className="mt-auto w-full" src={tasklyIllustration} alt="taskly illustration" />
 
           <ul className="mt-5 flex flex-col gap-2">
             {aside.points.map((point) => (

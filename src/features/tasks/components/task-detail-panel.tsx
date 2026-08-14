@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import { Link, useNavigate, useParams, useSearchParams } from "react-router"
 
+import { BusyRegion } from "@/components/busy-region"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
@@ -47,15 +48,15 @@ export function TaskDetailPanel() {
     <Sheet open onOpenChange={close}>
       <SheetContent className="data-[side=right]:w-full sm:max-w-md">
         {isPending ? (
-          <div className="flex flex-col gap-4 p-4" aria-hidden="true">
+          <BusyRegion label="Loading task" className="flex flex-col gap-4 p-4">
             <Skeleton className="h-6 w-3/4" />
             <Skeleton className="h-5 w-1/3" />
             <Skeleton className="h-24 w-full" />
-          </div>
+          </BusyRegion>
         ) : null}
 
         {isNotFound ? (
-          <div className="flex flex-col items-center justify-center gap-2 p-6 text-center">
+          <div role="alert" className="flex flex-col items-center justify-center gap-2 p-6 text-center">
             <p className="text-sm font-medium">This task no longer exists</p>
             <Button variant="outline" size="sm" className="mt-2" asChild>
               <Link to={listPath}>Back to tasks</Link>

@@ -1,5 +1,7 @@
 import { Link } from "react-router"
 
+import { useRouteHeading } from "@/app/router/route-focus-context"
+import { BusyRegion } from "@/components/busy-region"
 import { EmptyState } from "@/components/empty-state"
 import { ErrorState } from "@/components/error-state"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -11,17 +13,19 @@ import type { ProjectSummary } from "@/features/projects/api/projects.api"
 
 function ProjectsGridSkeleton() {
   return (
-    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <BusyRegion label="Loading projects" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {[0, 1, 2].map((i) => (
-        <li key={i}>
-          <Skeleton className="h-32 w-full rounded-xl" />
-        </li>
+        <Skeleton key={i} className="h-32 w-full rounded-xl" />
       ))}
-    </ul>
+    </BusyRegion>
   )
 }
 
-function ProjectCard({ project }: { project: ProjectSummary }) {
+interface ProjectCardProps {
+  project: ProjectSummary
+}
+
+function ProjectCard({ project }: ProjectCardProps) {
   return (
     <Link
       to={`/projects/${project.id}/tasks`}
@@ -50,7 +54,11 @@ function ProjectCard({ project }: { project: ProjectSummary }) {
   )
 }
 
-function ProjectsGrid({ projects }: { projects: ProjectSummary[] }) {
+interface ProjectsGridProps {
+  projects: ProjectSummary[]
+}
+
+function ProjectsGrid({ projects }: ProjectsGridProps) {
   if (projects.length === 0) {
     return (
       <EmptyState
@@ -74,10 +82,17 @@ function ProjectsGrid({ projects }: { projects: ProjectSummary[] }) {
 
 export function ProjectsPage() {
   const { data: projects, isPending, isError, error, refetch } = useProjects()
+  const registerRouteHeading = useRouteHeading<HTMLHeadingElement>()
 
   return (
     <div className="flex flex-col gap-6 px-6">
-      <h1 className="text-xl font-semibold tracking-tight">Projects</h1>
+      <h1
+        ref={registerRouteHeading}
+        tabIndex={-1}
+        className="focus-visible:ring-ring rounded-sm text-xl font-semibold tracking-tight outline-none focus-visible:ring-3"
+      >
+        Projects
+      </h1>
 
       {isPending && <ProjectsGridSkeleton />}
       {isError && <ErrorState error={error} onRetry={() => refetch()} />}

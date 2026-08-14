@@ -7,9 +7,10 @@ interface LabelListProps {
   projectId: string
   editable: boolean
   onCreateFocus: () => void
+  onLabelDeleted?: () => void
 }
 
-export function LabelList({ labels, projectId, editable, onCreateFocus }: LabelListProps) {
+export function LabelList({ labels, projectId, editable, onCreateFocus, onLabelDeleted }: LabelListProps) {
   if (labels.length === 0) {
     return (
       <EmptyState
@@ -37,7 +38,13 @@ export function LabelList({ labels, projectId, editable, onCreateFocus }: LabelL
   return (
     <div className="flex flex-col gap-2">
       {labels.map((label) => (
-        <LabelRow key={label.id} label={label} projectId={projectId} editable={editable} />
+        <LabelRow
+          key={label.id}
+          label={label}
+          projectId={projectId}
+          editable={editable}
+          onDeleted={onLabelDeleted}
+        />
       ))}
     </div>
   )

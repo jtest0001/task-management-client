@@ -1,12 +1,11 @@
 import { PlusIcon } from "lucide-react"
-import { NavLink, useParams } from "react-router"
+import { NavLink } from "react-router"
 
+import { BusyRegion } from "@/components/busy-region"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useProject, useProjects } from "@/features/projects/api/projects.queries"
+import { useProjects } from "@/features/projects/api/projects.queries"
 import { CreateProjectDialog } from "@/features/projects/components/create-project-dialog"
-import { InviteTeammatesCard } from "@/features/projects/components/invite-teammates-card"
-import { canAddMembersToProject } from "@/features/projects/lib/capabilities"
 import { toApiError } from "@/lib/api/errors"
 import { cn } from "@/lib/utils"
 import type { ProjectSummary } from "@/features/projects/api/projects.api"
@@ -17,17 +16,20 @@ import type { ProjectSummary } from "@/features/projects/api/projects.api"
  */
 function ProjectNavSkeleton() {
   return (
-    <ul className="flex flex-col gap-1">
+    <BusyRegion label="Loading projects" className="flex flex-col gap-1">
       {[0, 1, 2].map((i) => (
-        <li key={i}>
-          <Skeleton className="h-8 w-full rounded-lg" />
-        </li>
+        <Skeleton key={i} className="h-8 w-full rounded-lg" />
       ))}
-    </ul>
+    </BusyRegion>
   )
 }
 
-function ProjectNavError({ error, onRetry }: { error: unknown; onRetry: () => void }) {
+interface ProjectNavErrorProps {
+  error: unknown
+  onRetry: () => void
+}
+
+function ProjectNavError({ error, onRetry }: ProjectNavErrorProps) {
   return (
     <div role="alert" className="flex flex-col items-start gap-2 px-2">
       <p className="text-muted-foreground text-sm">{toApiError(error).message}</p>
@@ -38,7 +40,12 @@ function ProjectNavError({ error, onRetry }: { error: unknown; onRetry: () => vo
   )
 }
 
-function ProjectNavList({ projects }: { projects: ProjectSummary[] }) {
+interface ProjectNavListProps {
+  projects: ProjectSummary[]
+  onNavigate?: () => void
+}
+
+function ProjectNavList({ projects, onNavigate }: ProjectNavListProps) {
   if (projects.length === 0) {
     return <p className="text-muted-foreground px-2 text-sm">No projects yet</p>
   }
@@ -50,6 +57,7 @@ function ProjectNavList({ projects }: { projects: ProjectSummary[] }) {
           <NavLink
             to={`/projects/${project.id}`}
             end={false}
+            onClick={onNavigate}
             className={({ isActive }) =>
               cn(
                 "text-foreground hover:bg-muted relative flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm",
@@ -74,10 +82,12 @@ function ProjectNavList({ projects }: { projects: ProjectSummary[] }) {
   )
 }
 
-export function ProjectNav() {
-  const { projectId } = useParams()
+interface ProjectNavProps {
+  onNavigate?: () => void
+}
+
+export function ProjectNav({ onNavigate }: ProjectNavProps) {
   const { data: projects, isPending, isError, error, refetch } = useProjects()
-  const { data: selectedProject } = useProject(projectId)
 
   return (
     <nav aria-label="Projects" className="flex h-full flex-col gap-4 px-3 py-4">
@@ -94,11 +104,7 @@ export function ProjectNav() {
 
       {isPending && <ProjectNavSkeleton />}
       {isError && <ProjectNavError error={error} onRetry={() => refetch()} />}
-      {!isPending && !isError && <ProjectNavList projects={projects} />}
-
-      {selectedProject && canAddMembersToProject(selectedProject.role) && (
-        <InviteTeammatesCard projectId={selectedProject.id} />
-      )}
+      {!isPending && !isError && <ProjectNavList projects={projects} onNavigate={onNavigate} />}
     </nav>
   )
 }
