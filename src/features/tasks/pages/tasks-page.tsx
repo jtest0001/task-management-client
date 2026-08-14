@@ -38,7 +38,9 @@ export function TasksPage() {
 
   return (
     <div className="flex flex-col gap-4 px-6">
-      <h2 className="text-lg font-semibold tracking-tight">Tasks</h2>
+      {/* The active tab already says "Tasks" — this is a landmark for screen readers, not a
+          visible heading. */}
+      <h2 className="sr-only">Tasks</h2>
 
       <TaskToolbar
         query={query}

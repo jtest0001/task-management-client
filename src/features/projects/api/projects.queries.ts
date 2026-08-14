@@ -2,7 +2,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query"
 
 import { projectsApi } from "@/features/projects/api/projects.api"
 import { projectKeys } from "@/features/projects/api/projects.keys"
-import type { ProjectSummary } from "@/types/api"
+import type { ProjectSummary } from "@/features/projects/api/projects.api"
 
 /**
  * Raw membership rows, unpaginated. The sidebar keeps this mounted for the whole signed-in

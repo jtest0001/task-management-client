@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { UserAvatar } from "@/components/user-avatar"
 import { CommentsSection } from "@/features/comments/components/comments-section"
+import { TaskLabelsSection } from "@/features/labels/components/task-labels-section"
 import { useMembers } from "@/features/members/api/members.queries"
 import { useTask } from "@/features/tasks/api/tasks.queries"
 import { TaskPriorityBadge, TaskStatusChip } from "@/features/tasks/components/task-badges"
@@ -142,6 +143,7 @@ export function TaskDetailPanel() {
               </>
             ) : null}
 
+            {projectId ? <TaskLabelsSection taskId={taskId} projectId={projectId} /> : null}
             <CommentsSection taskId={taskId} />
           </div>
         ) : null}

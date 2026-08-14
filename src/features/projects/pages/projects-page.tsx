@@ -7,7 +7,7 @@ import { CreateProjectDialog } from "@/features/projects/components/create-proje
 import { useProjects } from "@/features/projects/api/projects.queries"
 import { formatDueDate } from "@/lib/utils/date"
 import { cn } from "@/lib/utils"
-import type { ProjectSummary } from "@/types/api"
+import type { ProjectSummary } from "@/features/projects/api/projects.api"
 
 function ProjectsGridSkeleton() {
   return (

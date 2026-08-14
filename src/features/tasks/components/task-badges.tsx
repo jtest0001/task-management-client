@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils"
-import type { TaskPriority, TaskStatus } from "@/types/api"
+import type { TaskPriority, TaskStatus } from "@/features/tasks/api/tasks.api"
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
   TODO: "To do",

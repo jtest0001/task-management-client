@@ -9,7 +9,7 @@ import { EditProjectDialog } from "@/features/projects/components/edit-project-d
 import { useProject, useProjects } from "@/features/projects/api/projects.queries"
 import { canManageProject } from "@/features/projects/lib/capabilities"
 import { cn } from "@/lib/utils"
-import type { ProjectSummary } from "@/types/api"
+import type { ProjectSummary } from "@/features/projects/api/projects.api"
 import { CreateTaskDialog } from "@/features/tasks/components/create-task-dialog"
 
 function WorkspaceHeaderSkeleton() {
