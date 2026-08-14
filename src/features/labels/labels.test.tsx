@@ -318,14 +318,16 @@ describe("task panel attach/detach", () => {
 
   it("treats a 409 on attach as success and surfaces no error", async () => {
     const user = userEvent.setup()
+    let attached: Label[] = []
     server.use(
       ...authed(
         "MEMBER",
         http.get(`${API}/projects/:projectId/labels`, () => HttpResponse.json([label({})])),
-        http.get(`${API}/tasks/:taskId/labels`, () => HttpResponse.json([])),
-        http.post(`${API}/tasks/:taskId/labels/:labelId`, () =>
-          HttpResponse.json({ message: "Label already attached to task" }, { status: 409 })
-        )
+        http.get(`${API}/tasks/:taskId/labels`, () => HttpResponse.json(attached)),
+        http.post(`${API}/tasks/:taskId/labels/:labelId`, () => {
+          attached = [label({})]
+          return HttpResponse.json({ message: "Label already attached to task" }, { status: 409 })
+        })
       )
     )
 
@@ -334,6 +336,7 @@ describe("task panel attach/detach", () => {
     await user.click(await within(panel).findByRole("button", { name: "Add label" }))
     await user.click(await screen.findByRole("button", { name: "Frontend" }))
 
+    await waitFor(() => expect(within(panel).getByRole("button", { name: "Remove Frontend" })).toBeInTheDocument())
     expect(screen.queryByRole("alert")).not.toBeInTheDocument()
   })
 

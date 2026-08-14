@@ -330,8 +330,9 @@ clean.
 - **A colour picker was added to the prototype's text-only field**, per the phase doc's own
   scoping — the design spec shows a plain text input, but a picker plus the same text field
   satisfies both usability and the "colour is never the only path in" rule.
-- **A Delete control per label row**, which `design/assets/prototype.js`'s `renderLabels()` does
-  not show — added because Phase 8 ships full CRUD, not just create/edit.
+- **A Delete control per label row**, added because Phase 8 ships full CRUD, not just
+  create/edit. `design/assets/prototype.js`'s `renderLabels()` was subsequently updated to match
+  and now shows the same per-row Edit/Delete pair.
 
 ---
 

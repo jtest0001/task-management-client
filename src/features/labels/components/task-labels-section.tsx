@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { Check, X } from "lucide-react"
 import { useState } from "react"
 import { Link } from "react-router"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -9,15 +10,23 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useAttachLabel, useDetachLabel } from "@/features/labels/api/labels.mutations"
 import { useLabels, useTaskLabels } from "@/features/labels/api/labels.queries"
 import { taskLabelKeys } from "@/features/labels/api/labels.keys"
+import { useProject } from "@/features/projects/api/projects.queries"
+import { canManageLabels } from "@/features/projects/lib/capabilities"
 import { toApiError } from "@/lib/api/errors"
 
 export function TaskLabelsSection({ taskId, projectId }: { taskId: string; projectId: string }) {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
   const { data: taskLabels, isPending, isError, error } = useTaskLabels(taskId)
-  const { data: projectLabels } = useLabels(projectId)
+  const {
+    data: projectLabels,
+    isError: isProjectLabelsError,
+    error: projectLabelsError,
+    refetch: refetchProjectLabels
+  } = useLabels(projectId)
   const attachLabel = useAttachLabel(taskId)
   const detachLabel = useDetachLabel(taskId)
+  const canManage = canManageLabels(useProject(projectId).data?.role)
 
   if (isPending) {
     return (
@@ -45,20 +54,28 @@ export function TaskLabelsSection({ taskId, projectId }: { taskId: string; proje
   const attachedIds = new Set(taskLabels.map((label) => label.id))
   const hasProjectLabels = (projectLabels?.length ?? 0) > 0
 
+  const handleDetach = (labelId: string) => {
+    // Idempotent server-side — no pre-check, no optimistic rollback needed.
+    detachLabel.mutate(labelId, {
+      onError: (mutationErr) => toast.error(toApiError(mutationErr).message)
+    })
+  }
+
   const toggle = (labelId: string) => {
     if (attachedIds.has(labelId)) {
-      // Idempotent server-side — no pre-check, no optimistic rollback needed.
-      detachLabel.mutate(labelId)
+      handleDetach(labelId)
       return
     }
 
     attachLabel.mutate(labelId, {
-      onError: (mutationError) => {
-        const apiError = toApiError(mutationError)
+      onError: (mutationErr) => {
+        const apiError = toApiError(mutationErr)
         // A 409 here means the cache was stale (already attached), not a real failure —
         // reconcile the cache and move on instead of surfacing an error.
         if (apiError.status === 409) {
           queryClient.invalidateQueries({ queryKey: taskLabelKeys.list(taskId) })
+        } else {
+          toast.error(apiError.message)
         }
       }
     })
@@ -68,11 +85,22 @@ export function TaskLabelsSection({ taskId, projectId }: { taskId: string; proje
     <section>
       <h3 className="text-sm font-semibold">Labels</h3>
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
-        {taskLabels.length === 0 ? (
+        {taskLabels.length === 0 && isProjectLabelsError ? (
+          <p role="alert" className="text-muted-foreground text-sm">
+            {toApiError(projectLabelsError).message}{" "}
+            <button
+              type="button"
+              onClick={() => refetchProjectLabels()}
+              className="text-primary font-medium underline underline-offset-4"
+            >
+              Retry
+            </button>
+          </p>
+        ) : taskLabels.length === 0 ? (
           <p className="text-muted-foreground text-sm">
             {hasProjectLabels ? (
               "No labels on this task yet."
-            ) : (
+            ) : canManage ? (
               <>
                 This project has no labels yet.{" "}
                 <Link
@@ -83,6 +111,8 @@ export function TaskLabelsSection({ taskId, projectId }: { taskId: string; proje
                 </Link>
                 .
               </>
+            ) : (
+              "This project has no labels yet."
             )}
           </p>
         ) : (
@@ -96,7 +126,7 @@ export function TaskLabelsSection({ taskId, projectId }: { taskId: string; proje
               <button
                 type="button"
                 aria-label={`Remove ${label.name}`}
-                onClick={() => detachLabel.mutate(label.id)}
+                onClick={() => handleDetach(label.id)}
                 className="hover:bg-muted-foreground/20 rounded-full p-0.5"
               >
                 <X className="size-3" aria-hidden="true" />
