@@ -56,7 +56,7 @@ export function TasksPage() {
           registerRouteHeading(el)
         }}
         tabIndex={-1}
-        className="focus-visible:ring-ring sr-only text-sm font-semibold focus-visible:not-sr-only focus-visible:rounded-md focus-visible:ring-3 focus-visible:outline-none"
+        className="sr-only"
       >
         Tasks
       </h2>

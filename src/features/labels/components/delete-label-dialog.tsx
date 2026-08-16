@@ -31,9 +31,7 @@ export function DeleteLabelDialog({ label, projectId, onDeleted }: DeleteLabelDi
     try {
       await deleteLabel.mutateAsync()
       setOpen(false)
-      // The trigger button unmounts along with the deleted row, so Radix's own focus-restore
-      // has nothing to land on — hand focus to the page heading instead.
-      onDeleted?.()
+      setTimeout(() => onDeleted?.())
     } catch (error) {
       setOpen(false)
       toast.error(toApiError(error).message)
@@ -43,7 +41,12 @@ export function DeleteLabelDialog({ label, projectId, onDeleted }: DeleteLabelDi
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="text-muted-foreground" aria-label={`Delete ${label.name}`}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground"
+          aria-label={`Delete ${label.name}`}
+        >
           Delete
         </Button>
       </AlertDialogTrigger>

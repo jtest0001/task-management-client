@@ -12,21 +12,21 @@ Update the status table as phases land.
 
 ## Status
 
-| Phase                  | Scope                                            | Status      |
-| ---------------------- | ------------------------------------------------ | ----------- |
-| 0 — API contract audit | Read backend source, document real shapes        | ✅ Done     |
-| 0.5 — Backend unblock  | Fix 3 blocking defects + seed                    | ✅ Done     |
-| 1 — Foundation         | Tooling, API client, refresh flow, shell, tests  | ✅ Done     |
-| 2 — Authentication     | Register, login, logout, boot restore, guards    | ✅ Done     |
-| 3 — Projects           | List, create, workspace shell, role plumbing     | ✅ Done     |
-| 4 — Task list          | Filters, search, sort, pagination, URL state     | ✅ Done     |
-| 5 — Task CRUD + detail | Create, detail route, edit, delete               | ✅ Done     |
-| 6 — Comments           | List, create, edit/delete own                    | ✅ Done     |
-| 7 — Members            | List, add by email, promote/demote, remove       | ✅ Done     |
-| 8 — Labels + TaskLabel | Definitions CRUD, attach/detach                  | ✅ Done     |
-| 9 — UX polish          | States, a11y, responsive, keyboard               | ✅ Done     |
-| 10 — Test coverage     | Fill gaps, add E2E for critical flows            | ⬜          |
-| 11 — Kanban (optional) | Board view, drag/drop, optimistic status         | ⬜ Deferred |
+| Phase                  | Scope                                           | Status      |
+| ---------------------- | ----------------------------------------------- | ----------- |
+| 0 — API contract audit | Read backend source, document real shapes       | ✅ Done     |
+| 0.5 — Backend unblock  | Fix 3 blocking defects + seed                   | ✅ Done     |
+| 1 — Foundation         | Tooling, API client, refresh flow, shell, tests | ✅ Done     |
+| 2 — Authentication     | Register, login, logout, boot restore, guards   | ✅ Done     |
+| 3 — Projects           | List, create, workspace shell, role plumbing    | ✅ Done     |
+| 4 — Task list          | Filters, search, sort, pagination, URL state    | ✅ Done     |
+| 5 — Task CRUD + detail | Create, detail route, edit, delete              | ✅ Done     |
+| 6 — Comments           | List, create, edit/delete own                   | ✅ Done     |
+| 7 — Members            | List, add by email, promote/demote, remove      | ✅ Done     |
+| 8 — Labels + TaskLabel | Definitions CRUD, attach/detach                 | ✅ Done     |
+| 9 — UX polish          | States, a11y, responsive, keyboard              | ✅ Done     |
+| 10 — Test coverage     | Fill gaps, add E2E for critical flows           | ⬜          |
+| 11 — Kanban (optional) | Board view, drag/drop, optimistic status        | ⬜ Deferred |
 
 ---
 
@@ -341,7 +341,7 @@ the shipped summary. No API shapes changed, so `frontend-api-contract.md` has no
 this phase.
 
 New shared primitives: `app/error-boundary.tsx` (`AppErrorBoundary`, wraps the routed tree in
-`main.tsx`, renders `ErrorState` with a reload action), `app/router/{route-focus,route-focus-context}.tsx`
+`main.tsx`, renders an accessible alert with a reload action), `app/router/{route-focus,route-focus-context}.tsx`
 (moves focus to the new route's heading on navigation), `components/busy-region.tsx` (the
 `aria-busy` + `aria-live="polite"` + `sr-only`-label wrapper, modelled on `require-auth.tsx`'s
 existing pattern, applied to all nine loading-skeleton sites), `components/scrollable-table-region.tsx`
@@ -441,16 +441,16 @@ first genuinely good candidate for optimistic updates, with rollback.
 
 ## Backend gaps to track
 
-| Id    | Gap                                             | When it matters |
-| ----- | ----------------------------------------------- | --------------- |
+| Id    | Gap                                                                             | When it matters                  |
+| ----- | ------------------------------------------------------------------------------- | -------------------------------- |
 | BE-4  | ~~A task's labels cannot be read back~~ — fixed via `GET /tasks/:taskId/labels` | List-level display still unbuilt |
-| BE-5  | No `assignee` projection on tasks               | Worked around   |
-| BE-7  | `GET /projects` is unpaginated                  | Not yet         |
-| BE-8  | No change-password endpoint                     | Backlog         |
-| BE-9  | Tasks can't be filtered for "unassigned" [^be9] | **Phase 4 on**  |
-| BE-10 | No project ownership transfer [^be10]           | **Phase 7**     |
-| —     | `search` matches `title` only                   | Phase 4 copy    |
-| —     | `refresh.schema.ts` is now dead code            | Cleanup         |
+| BE-5  | No `assignee` projection on tasks                                               | Worked around                    |
+| BE-7  | `GET /projects` is unpaginated                                                  | Not yet                          |
+| BE-8  | No change-password endpoint                                                     | Backlog                          |
+| BE-9  | Tasks can't be filtered for "unassigned" [^be9]                                 | **Phase 4 on**                   |
+| BE-10 | No project ownership transfer [^be10]                                           | **Phase 7**                      |
+| —     | `search` matches `title` only                                                   | Phase 4 copy                     |
+| —     | `refresh.schema.ts` is now dead code                                            | Cleanup                          |
 
 [^be9]:
     `assigneeId` is uuid-validated, no way to express null. `PATCH` itself was fixed in

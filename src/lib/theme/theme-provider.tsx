@@ -13,6 +13,11 @@ function applyTheme(theme: Theme) {
   document.documentElement.classList.toggle("dark", resolved === "dark")
 }
 
+function loadTheme(): Theme {
+  const stored = localStorage.getItem(STORAGE_KEY)
+  return stored === "light" || stored === "dark" || stored === "system" ? stored : "system"
+}
+
 interface ThemeProviderProps {
   children: ReactNode
 }
@@ -23,9 +28,7 @@ interface ThemeProviderProps {
  * preference live while the user hasn't overridden it.
  */
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(
-    () => (localStorage.getItem(STORAGE_KEY) as Theme | null) ?? "system"
-  )
+  const [theme, setThemeState] = useState<Theme>(loadTheme)
 
   useEffect(() => {
     applyTheme(theme)

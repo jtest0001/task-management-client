@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import { Link, useNavigate, useParams, useSearchParams } from "react-router"
 
+import { useRouteHeadingFocus } from "@/app/router/route-focus-context"
 import { BusyRegion } from "@/components/busy-region"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -26,6 +27,7 @@ export function TaskDetailPanel() {
   const { projectId, taskId } = useParams<{ projectId: string; taskId: string }>()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const focusHeading = useRouteHeadingFocus()
 
   const { data: task, isPending, isError, error } = useTask(taskId ?? "")
   const { data: members } = useMembers(projectId)
@@ -38,7 +40,9 @@ export function TaskDetailPanel() {
   const listPath = { pathname: `/projects/${projectId}/tasks`, search: searchParams.toString() }
 
   const close = (open: boolean) => {
-    if (!open) navigate(listPath)
+    if (open) return
+    navigate(listPath)
+    focusHeading()
   }
 
   const apiError = isError ? toApiError(error) : undefined

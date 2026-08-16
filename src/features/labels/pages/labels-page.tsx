@@ -43,18 +43,13 @@ export function LabelsPage() {
 
   return (
     <div className="flex flex-col gap-4 px-6">
-      {/* The active tab already says "Labels", so this stays visually hidden most of the time —
-          it's a landmark for screen readers and the focus target after a route change or after
-          deleting a label, since its trigger button unmounts along with the row. It reveals
-          itself on focus so keyboard users get a visible indicator too, instead of focus
-          silently landing on an invisible element. */}
       <h2
         ref={(el) => {
           headingRef.current = el
           registerRouteHeading(el)
         }}
         tabIndex={-1}
-        className="sr-only text-sm font-semibold focus-visible:not-sr-only focus-visible:rounded-md focus-visible:ring-ring focus-visible:ring-3 focus-visible:outline-none"
+        className="sr-only"
       >
         Labels
       </h2>

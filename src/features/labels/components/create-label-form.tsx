@@ -76,14 +76,15 @@ export const CreateLabelForm = forwardRef<CreateLabelFormHandle, { projectId: st
               aria-describedby={errors.name ? nameErrorId : undefined}
               {...register("name")}
             />
-            {errors.name ? (
-              <p id={nameErrorId} className="text-destructive text-sm">
-                {errors.name.message}
-              </p>
-            ) : null}
           </div>
 
-          <div className="flex flex-col gap-1.5 sm:w-48">
+          {errors.name ? (
+            <p id={nameErrorId} className="text-destructive text-sm sm:order-last sm:basis-full">
+              {errors.name.message}
+            </p>
+          ) : null}
+
+          <div className="flex flex-1 flex-col gap-1.5 sm:w-48">
             <Label htmlFor={colorId}>Colour</Label>
             <Controller
               control={control}

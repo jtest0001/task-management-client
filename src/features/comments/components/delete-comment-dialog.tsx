@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { toast } from "sonner"
 
 import {
@@ -26,13 +26,12 @@ interface DeleteCommentDialogProps {
 export function DeleteCommentDialog({ comment, taskId, onDeleted }: DeleteCommentDialogProps) {
   const [open, setOpen] = useState(false)
   const deleteComment = useDeleteComment(comment.id, taskId)
-  const deletedRef = useRef(false)
 
   const handleDelete = async () => {
     try {
       await deleteComment.mutateAsync()
-      deletedRef.current = true
       setOpen(false)
+      setTimeout(() => onDeleted?.())
     } catch (error) {
       setOpen(false)
       toast.error(toApiError(error).message)
@@ -46,16 +45,7 @@ export function DeleteCommentDialog({ comment, taskId, onDeleted }: DeleteCommen
           Delete
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent
-        onCloseAutoFocus={(event) => {
-          if (!deletedRef.current) return
-          // The trigger button unmounts along with the deleted comment, so Radix's default
-          // restore-to-trigger has nothing to land on — hand focus to the Comments heading
-          // instead, before Radix's own restoration can run and override it.
-          event.preventDefault()
-          onDeleted?.()
-        }}
-      >
+      <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete this comment?</AlertDialogTitle>
           <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>

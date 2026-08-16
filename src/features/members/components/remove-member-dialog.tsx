@@ -31,9 +31,7 @@ export function RemoveMemberDialog({ projectId, member, onRemoved }: RemoveMembe
     try {
       await removeMember.mutateAsync(member.user.id)
       setOpen(false)
-      // The trigger button unmounts along with the removed row, so Radix's own focus-restore
-      // has nothing to land on — hand focus to the page heading instead.
-      onRemoved?.()
+      setTimeout(() => onRemoved?.())
     } catch (error) {
       setOpen(false)
       toast.error(toApiError(error).message)

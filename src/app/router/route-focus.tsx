@@ -35,5 +35,9 @@ export function RouteFocusProvider({ children }: RouteFocusProviderProps) {
     headingRef.current = element
   }
 
-  return <RouteFocusContext value={{ register }}>{children}</RouteFocusContext>
+  const focusHeading = () => {
+    setTimeout(() => headingRef.current?.focus())
+  }
+
+  return <RouteFocusContext value={{ register, focusHeading }}>{children}</RouteFocusContext>
 }
