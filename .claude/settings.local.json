@@ -18,7 +18,8 @@
       "Bash(ls 'C:/Users/JE/Desktop/Code playground/Fullstack playground/Practice/task-management-app/task-management-api/src/modules/label')",
       "Bash(echo \"--- task-label module ---\")",
       "Bash(ls 'C:/Users/JE/Desktop/Code playground/Fullstack playground/Practice/task-management-app/task-management-api/src/modules/task-label')",
-      "Bash(echo \"--- task module ---\")"
+      "Bash(echo \"--- task module ---\")",
+      "Bash(node \"C:\\\\Users\\\\JE\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-JE-Desktop-Code-playground-Fullstack-playground-Practice-task-management-app-client-app\\\\ee319dbd-e90b-42f5-b0cb-b2ea6932380e\\\\scratchpad\\\\contrast.mjs\")"
     ]
   }
 }

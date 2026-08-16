@@ -50,16 +50,13 @@ export function TasksPage() {
 
   return (
     <div className="flex flex-col gap-4 px-6">
-      {/* The active tab already says "Tasks" — this is a landmark for screen readers, not a
-          visible heading. Also the focus target after a route change and after an action that
-          unmounts the control that triggered it (clearing filters, jumping back a page). */}
       <h2
         ref={(el) => {
           headingRef.current = el
           registerRouteHeading(el)
         }}
         tabIndex={-1}
-        className="sr-only outline-none"
+        className="focus-visible:ring-ring sr-only text-sm font-semibold focus-visible:not-sr-only focus-visible:rounded-md focus-visible:ring-3 focus-visible:outline-none"
       >
         Tasks
       </h2>

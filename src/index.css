@@ -21,6 +21,9 @@
  * Neutrals carry a faint teal cast (hue ~186) so greys sit with the brand rather than against it.
  */
 :root {
+  /* Tells the browser which palette to use for native chrome it draws itself — scrollbars,
+     `<select>` popups, autofill — so they follow `.dark` instead of staying light. */
+  color-scheme: light;
   --background: oklch(1 0 0);
   /* Page canvas behind white surfaces (topbar, rail, cards) — design's --canvas / neutral-50,
      same value as --muted. Kept distinct from --background so `bg-background` on a card still
@@ -120,6 +123,7 @@
  * canvas is 7.05:1 — so `--primary` and `--brand` converge here.
  */
 .dark {
+  color-scheme: dark;
   --background: oklch(0.16 0.018 190);
   /* Dark mode already separates canvas from surface via --background vs --card, so canvas is
      just --background here — no prototype dark mode exists to mirror. */

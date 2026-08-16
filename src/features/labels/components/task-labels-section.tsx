@@ -83,7 +83,6 @@ export function TaskLabelsSection({ taskId, projectId }: TaskLabelsSectionProps)
         } else {
           toast.error(apiError.message)
         }
-        toast.error(apiError.message)
       }
     })
   }

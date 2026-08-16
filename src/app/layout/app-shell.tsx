@@ -1,16 +1,29 @@
 import { MenuIcon } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Outlet } from "react-router"
 
 import { UserMenu } from "@/app/layout/user-menu"
 import { RouteFocusProvider } from "@/app/router/route-focus"
 import { Logo } from "@/components/logo"
+import { ModeToggle } from "@/components/mode-toggle"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { ProjectNav } from "@/features/projects/components/project-nav"
 
 export function AppShell() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
+  // `SheetContent` is only visually hidden by `md:hidden` — its overlay and focus trap stay
+  // mounted. Resizing past the desktop breakpoint while it's open would otherwise leave the
+  // page behind an invisible, still-active dialog.
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 768px)")
+    const onChange = (event: MediaQueryListEvent) => {
+      if (event.matches) setMobileNavOpen(false)
+    }
+    media.addEventListener("change", onChange)
+    return () => media.removeEventListener("change", onChange)
+  }, [])
 
   return (
     <div className="flex min-h-svh flex-col">
@@ -34,7 +47,10 @@ export function AppShell() {
           </Button>
           <Logo />
         </div>
-        <UserMenu />
+        <div className="flex items-center gap-1">
+          <ModeToggle />
+          <UserMenu />
+        </div>
       </header>
 
       <div className="flex flex-1 flex-col md:flex-row">
@@ -53,7 +69,7 @@ export function AppShell() {
         </Sheet>
 
         <RouteFocusProvider>
-          <main id="main-content" className="min-w-0 flex-1 py-6">
+          <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 py-6">
             <Outlet />
           </main>
         </RouteFocusProvider>

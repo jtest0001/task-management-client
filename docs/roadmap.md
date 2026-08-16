@@ -24,7 +24,7 @@ Update the status table as phases land.
 | 6 — Comments           | List, create, edit/delete own                    | ✅ Done     |
 | 7 — Members            | List, add by email, promote/demote, remove       | ✅ Done     |
 | 8 — Labels + TaskLabel | Definitions CRUD, attach/detach                  | ✅ Done     |
-| 9 — UX polish          | States, a11y, responsive, keyboard               | ⬜          |
+| 9 — UX polish          | States, a11y, responsive, keyboard               | ✅ Done     |
 | 10 — Test coverage     | Fill gaps, add E2E for critical flows            | ⬜          |
 | 11 — Kanban (optional) | Board view, drag/drop, optimistic status         | ⬜ Deferred |
 
@@ -334,6 +334,63 @@ clean.
   create/edit. `design/assets/prototype.js`'s `renderLabels()` was subsequently updated to match
   and now shows the same per-row Edit/Delete pair.
 
+### Phase 9 — UX polish
+
+Full sweep and findings are recorded in [`phase-9-ux-polish.md`](./phase-9-ux-polish.md); this is
+the shipped summary. No API shapes changed, so `frontend-api-contract.md` has no updates from
+this phase.
+
+New shared primitives: `app/error-boundary.tsx` (`AppErrorBoundary`, wraps the routed tree in
+`main.tsx`, renders `ErrorState` with a reload action), `app/router/{route-focus,route-focus-context}.tsx`
+(moves focus to the new route's heading on navigation), `components/busy-region.tsx` (the
+`aria-busy` + `aria-live="polite"` + `sr-only`-label wrapper, modelled on `require-auth.tsx`'s
+existing pattern, applied to all nine loading-skeleton sites), `components/scrollable-table-region.tsx`
+(`tabIndex={0}` + `role="region"` + accessible name, replacing the dead `table-scroll` class in
+both `task-table.tsx` and `members-table.tsx`).
+
+Per-screen fixes across every feature: sign-out wrapped in `try`/`catch` with `isSigningOut` reset
+and a `toast.error` (`user-menu.tsx`); label attach/detach failures now surface via `toast.error`,
+409 still silently reconciled (`task-labels-section.tsx`); the task panel's 404 branch gained
+`role="alert"`; focus returns to the triggering control after a dialog-driven delete
+(delete-comment, remove-member, delete-label) and after cancelling a comment edit; the task list
+announces committed filter/search/sort changes and shows a result count even at zero results;
+refetch dimming moved off the text (was failing contrast at `opacity-60`) onto a non-text
+affordance; pagination keeps focus on Previous/Next when a boundary disables it; the labels page
+now gates its create form on the project query resolving, matching `members-page.tsx`; a skip
+link plus an `id`ed `<main>`; comments gained `aria-expanded` on the collapse toggle and composer
+copy for the ⌘/Ctrl+Enter submit shortcut; `sm:grid-cols-2` on the task form's Status/Priority
+pair; the workspace header skeleton gained the `px-6` its real header has, so the page no longer
+shifts on load. The toast-discipline rule (§ above, "Toasts are for a failure with no form or
+field...") was written into `CLAUDE.md`'s Conventions, codifying the five pre-existing call sites
+plus the two (sign-out, label attach/detach) that joined them here.
+
+The app shell gained a real mobile layout: the project rail collapses behind a Radix `Sheet` off
+the top bar below `md` (Decision, `phase-9-ux-polish.md` §5.1) instead of stacking the whole rail
+above page content. `invite-teammates-card.tsx`'s three hardcoded placeholder avatars were
+removed as part of that rework. The brand mark moved from `assets/illustration-tasks.svg` to a
+new `taskly-logo.svg` / `taskly-illustration.webp` pair rendered through `components/logo.tsx`;
+`vite-plugin-svgr` was added so the logo imports as a component. `.dark` CSS block and the
+`bg-invite-card` utility's fate: the former is deliberately left unshipped and unverified
+(Decision, § 5.5 — building a toggle is a feature, not polish); the latter was deleted as dead
+CSS once the invite card's markup changed.
+
+Verified: `typecheck`, `lint`, `test -- --run` (124 tests), and `build` all clean. The `docs/*.md`
+sweep table (`phase-9-ux-polish.md` §2) was re-walked screen-by-screen after the fixes landed.
+
+**Deviations from the plan:**
+
+- **No confirmation dialog on member role change.** Considered (C-1) and deliberately rejected —
+  reversible, backend-authoritative, and a dialog on every `<select>` change would be noise. See
+  `phase-9-ux-polish.md` §5.4.
+- **Dark mode.** Unshipped as of this phase — the `.dark` token block in `index.css` predated a
+  toggle. A toggle shipped afterward: `lib/theme/theme-provider.tsx` + `theme-context.ts`
+  (localStorage-backed, no `next-themes` since this is a Vite SPA) and `components/mode-toggle.tsx`
+  (dropdown in `app-shell.tsx`'s header, next to `UserMenu`). The existing `.dark` palette was
+  checked against the design system's AA rules and needed no changes — every text pairing already
+  cleared 4.5:1 (most ≥6.5:1), including the status/priority soft-badge pairs.
+- **No new backend gaps surfaced.** This was a frontend-only sweep; BE-4/5/7/8/9/10 are
+  unaffected.
+
 ---
 
 ## Locked decisions
@@ -366,14 +423,6 @@ Carry these forward; they are consequences of the real API, not preferences.
 ---
 
 ## ⬜ Remaining phases
-
-### Phase 9 — UX polish
-
-Sweep every screen for: loading / empty / error states, toast discipline (not for everything),
-confirmation dialogs, responsive behaviour, keyboard paths, focus management, contrast, and
-status never conveyed by colour alone.
-
----
 
 ### Phase 10 — Test coverage
 

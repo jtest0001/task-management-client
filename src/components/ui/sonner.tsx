@@ -3,12 +3,17 @@
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
 
-// Upstream shadcn reads the theme from `next-themes`. This is a Vite SPA with no theme
-// provider, so it follows the OS preference directly.
+import { useTheme } from "@/lib/theme/theme-context"
+
+// Upstream shadcn reads the theme from `next-themes`; this reads it from our own
+// ThemeProvider instead. Sonner accepts "light" | "dark" | "system" directly, so an
+// unresolved "system" value passes straight through to its own OS-preference handling.
 const Toaster = ({ ...props }: ToasterProps) => {
+  const { theme } = useTheme()
+
   return (
     <Sonner
-      theme="system"
+      theme={theme}
       richColors
       className="toaster group"
       icons={{
