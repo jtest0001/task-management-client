@@ -249,6 +249,8 @@ describe("tasks page", () => {
       expect(url.searchParams.get("page")).toBe("2")
     })
 
-    expect(await within(main).findByRole("button", { name: "Next" })).toBeDisabled()
+    // aria-disabled, not the native `disabled` attribute — a genuinely disabled button drops
+    // focus when it becomes unfocusable mid-interaction (F-4), so it stays focusable but inert.
+    expect(await within(main).findByRole("button", { name: "Next" })).toHaveAttribute("aria-disabled", "true")
   })
 })

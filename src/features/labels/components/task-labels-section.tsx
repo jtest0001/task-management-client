@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Link } from "react-router"
 import { toast } from "sonner"
 
+import { BusyRegion } from "@/components/busy-region"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -14,7 +15,12 @@ import { useProject } from "@/features/projects/api/projects.queries"
 import { canManageLabels } from "@/features/projects/lib/capabilities"
 import { toApiError } from "@/lib/api/errors"
 
-export function TaskLabelsSection({ taskId, projectId }: { taskId: string; projectId: string }) {
+interface TaskLabelsSectionProps {
+  taskId: string
+  projectId: string
+}
+
+export function TaskLabelsSection({ taskId, projectId }: TaskLabelsSectionProps) {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
   const { data: taskLabels, isPending, isError, error } = useTaskLabels(taskId)
@@ -32,10 +38,10 @@ export function TaskLabelsSection({ taskId, projectId }: { taskId: string; proje
     return (
       <section>
         <h3 className="text-sm font-semibold">Labels</h3>
-        <div className="mt-2 flex gap-1.5" aria-hidden="true">
+        <BusyRegion label="Loading labels" className="mt-2 flex gap-1.5">
           <Skeleton className="h-6 w-16 rounded-full" />
           <Skeleton className="h-6 w-20 rounded-full" />
-        </div>
+        </BusyRegion>
       </section>
     )
   }
@@ -121,7 +127,11 @@ export function TaskLabelsSection({ taskId, projectId }: { taskId: string; proje
               key={label.id}
               className="bg-secondary inline-flex items-center gap-1.5 rounded-full py-0.5 pr-1 pl-2 text-xs font-medium"
             >
-              <span className="size-1.5 shrink-0 rounded-full" style={{ background: label.color }} aria-hidden="true" />
+              <span
+                className="size-1.5 shrink-0 rounded-full"
+                style={{ background: label.color }}
+                aria-hidden="true"
+              />
               {label.name}
               <button
                 type="button"

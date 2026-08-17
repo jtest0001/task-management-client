@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useNavigate, useSearchParams } from "react-router"
 import { toast } from "sonner"
 
+import { useRouteHeadingFocus } from "@/app/router/route-focus-context"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +23,7 @@ export function DeleteTaskDialog({ task }: { task: Task }) {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const focusHeading = useRouteHeadingFocus()
   const deleteTask = useDeleteTask(task.id, task.projectId)
 
   const handleDelete = async () => {
@@ -33,6 +35,7 @@ export function DeleteTaskDialog({ task }: { task: Task }) {
           replace: true
         }
       )
+      focusHeading()
     } catch (error) {
       setOpen(false)
       toast.error(toApiError(error).message)

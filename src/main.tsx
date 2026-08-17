@@ -1,6 +1,7 @@
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 
+import { AppErrorBoundary } from "@/app/error-boundary"
 import { AppProviders } from "@/app/providers/app-providers"
 import { AppRoutes } from "@/app/router/router"
 import { installInterceptors } from "@/lib/api/interceptors"
@@ -12,8 +13,10 @@ installInterceptors()
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AppProviders>
-      <AppRoutes />
-    </AppProviders>
+    <AppErrorBoundary>
+      <AppProviders>
+        <AppRoutes />
+      </AppProviders>
+    </AppErrorBoundary>
   </StrictMode>
 )

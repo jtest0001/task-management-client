@@ -1,3 +1,5 @@
+import { BusyRegion } from "@/components/busy-region"
+import { ScrollableTableRegion } from "@/components/scrollable-table-region"
 import { UserAvatar } from "@/components/user-avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/features/auth/auth-context"
@@ -20,15 +22,19 @@ function sortMembers(members: Member[]) {
 
 export function MembersTableSkeleton() {
   return (
-    <div className="flex flex-col gap-2" aria-hidden="true">
+    <BusyRegion label="Loading members" className="flex flex-col gap-2">
       {[0, 1, 2].map((i) => (
         <Skeleton key={i} className="h-12 w-full rounded-lg" />
       ))}
-    </div>
+    </BusyRegion>
   )
 }
 
-function RoleBadge({ role }: { role: ProjectRole }) {
+interface RoleBadgeProps {
+  role: ProjectRole
+}
+
+function RoleBadge({ role }: RoleBadgeProps) {
   return (
     <span
       className={cn(
@@ -41,12 +47,19 @@ function RoleBadge({ role }: { role: ProjectRole }) {
   )
 }
 
-export function MembersTable({ projectId, role, members }: { projectId: string; role: ProjectRole; members: Member[] }) {
+interface MembersTableProps {
+  projectId: string
+  role: ProjectRole
+  members: Member[]
+  onMemberRemoved?: () => void
+}
+
+export function MembersTable({ projectId, role, members, onMemberRemoved }: MembersTableProps) {
   const { user } = useAuth()
   const ordered = sortMembers(members)
 
   return (
-    <div className="table-scroll border-border bg-card overflow-x-auto rounded-xl border shadow-xs">
+    <ScrollableTableRegion label="Members">
       <table className="w-full border-collapse text-sm">
         <caption className="sr-only">Members</caption>
         <thead>
@@ -85,12 +98,14 @@ export function MembersTable({ projectId, role, members }: { projectId: string; 
                 <span className="text-sm">{formatDueDate(member.joinedAt)}</span>
               </td>
               <td className="border-border border-t px-3 py-2.5">
-                {canRemoveMember(role, member.role) && <RemoveMemberDialog projectId={projectId} member={member} />}
+                {canRemoveMember(role, member.role) && (
+                  <RemoveMemberDialog projectId={projectId} member={member} onRemoved={onMemberRemoved} />
+                )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
+    </ScrollableTableRegion>
   )
 }

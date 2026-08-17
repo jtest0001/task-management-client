@@ -17,7 +17,13 @@ import { useDeleteLabel } from "@/features/labels/api/labels.mutations"
 import { toApiError } from "@/lib/api/errors"
 import type { Label } from "@/features/labels/api/labels.api"
 
-export function DeleteLabelDialog({ label, projectId }: { label: Label; projectId: string }) {
+interface DeleteLabelDialogProps {
+  label: Label
+  projectId: string
+  onDeleted?: () => void
+}
+
+export function DeleteLabelDialog({ label, projectId, onDeleted }: DeleteLabelDialogProps) {
   const [open, setOpen] = useState(false)
   const deleteLabel = useDeleteLabel(label.id, projectId)
 
@@ -25,6 +31,7 @@ export function DeleteLabelDialog({ label, projectId }: { label: Label; projectI
     try {
       await deleteLabel.mutateAsync()
       setOpen(false)
+      setTimeout(() => onDeleted?.())
     } catch (error) {
       setOpen(false)
       toast.error(toApiError(error).message)
@@ -34,7 +41,12 @@ export function DeleteLabelDialog({ label, projectId }: { label: Label; projectI
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="text-muted-foreground" aria-label={`Delete ${label.name}`}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground"
+          aria-label={`Delete ${label.name}`}
+        >
           Delete
         </Button>
       </AlertDialogTrigger>

@@ -2,7 +2,9 @@ import { useMemo } from "react"
 import { Clock } from "lucide-react"
 import { Link } from "react-router"
 
+import { BusyRegion } from "@/components/busy-region"
 import { EmptyState } from "@/components/empty-state"
+import { ScrollableTableRegion } from "@/components/scrollable-table-region"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TaskPriorityBadge, TaskStatusChip } from "@/features/tasks/components/task-badges"
@@ -17,23 +19,21 @@ const COLUMNS = ["Title", "Status", "Priority", "Assignee", "Due date"]
 
 export function TaskTableSkeleton() {
   return (
-    <div className="flex flex-col gap-2" aria-hidden="true">
+    <BusyRegion label="Loading tasks" className="flex flex-col gap-2">
       {[0, 1, 2, 3, 4].map((i) => (
         <Skeleton key={i} className="h-11 w-full rounded-lg" />
       ))}
-    </div>
+    </BusyRegion>
   )
 }
 
-function AssigneeCell({
-  assigneeId,
-  members,
-  membersPending
-}: {
+interface AssigneeCellProps {
   assigneeId: string | null
   members: Member[] | undefined
   membersPending: boolean
-}) {
+}
+
+function AssigneeCell({ assigneeId, members, membersPending }: AssigneeCellProps) {
   const email = useMemo(() => {
     if (assigneeId === null || !members) return undefined
     return members.find((m) => m.user.id === assigneeId)?.user.email
@@ -55,7 +55,12 @@ function AssigneeCell({
   return <span className="text-sm">{email ? email.split("@")[0] : "Unknown member"}</span>
 }
 
-function DueDateCell({ dueDate, status }: { dueDate: string | null; status: Task["status"] }) {
+interface DueDateCellProps {
+  dueDate: string | null
+  status: Task["status"]
+}
+
+function DueDateCell({ dueDate, status }: DueDateCellProps) {
   if (dueDate === null) {
     return <span className="text-muted-foreground text-sm">—</span>
   }
@@ -140,59 +145,67 @@ export function TaskTable({
   }
 
   return (
-    <div className="table-scroll border-border bg-card overflow-x-auto rounded-xl border shadow-xs">
-      <table
-        className={cn("w-full border-collapse text-sm", isPlaceholderData && "opacity-60")}
-        aria-busy={isPlaceholderData}
-      >
-        <caption className="sr-only">Tasks</caption>
-        <thead>
-          <tr className="bg-muted/50">
-            {COLUMNS.map((col) => (
-              <th
-                key={col}
-                scope="col"
-                className="text-muted-foreground border-border border-t px-3 py-2.5 text-left text-sm font-medium whitespace-nowrap"
-              >
-                {col}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {tasks.map((task) => (
-            <tr key={task.id} className="hover:bg-muted/50 relative">
-              <td className="border-border border-t px-3 py-2.5 font-medium">
-                <Link
-                  to={{ pathname: task.id, search }}
-                  className={cn(
-                    "focus-visible:ring-ring rounded-sm outline-none after:absolute after:inset-0 focus-visible:ring-2",
-                    task.status === "DONE" && "text-muted-foreground line-through"
-                  )}
+    <div className="relative">
+      {isPlaceholderData ? (
+        <div
+          aria-hidden="true"
+          className="bg-primary/70 absolute inset-x-0 top-0 z-10 h-0.5 animate-pulse rounded-full"
+        />
+      ) : null}
+      <ScrollableTableRegion label="Tasks">
+        <table
+          className={cn("w-full border-collapse text-sm", isPlaceholderData && "pointer-events-none")}
+          aria-busy={isPlaceholderData}
+        >
+          <caption className="sr-only">Tasks</caption>
+          <thead>
+            <tr className="bg-muted/50">
+              {COLUMNS.map((col) => (
+                <th
+                  key={col}
+                  scope="col"
+                  className="text-muted-foreground border-border border-t px-3 py-2.5 text-left text-sm font-medium whitespace-nowrap"
                 >
-                  {task.title}
-                </Link>
-              </td>
-              <td className="border-border border-t px-3 py-2.5">
-                <TaskStatusChip status={task.status} />
-              </td>
-              <td className="border-border border-t px-3 py-2.5">
-                <TaskPriorityBadge priority={task.priority} />
-              </td>
-              <td className="border-border border-t px-3 py-2.5">
-                <AssigneeCell
-                  assigneeId={task.assigneeId}
-                  members={members}
-                  membersPending={membersPending}
-                />
-              </td>
-              <td className="border-border border-t px-3 py-2.5">
-                <DueDateCell dueDate={task.dueDate} status={task.status} />
-              </td>
+                  {col}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {tasks.map((task) => (
+              <tr key={task.id} className="hover:bg-muted/50 relative">
+                <td className="border-border border-t px-3 py-2.5 font-medium">
+                  <Link
+                    to={{ pathname: task.id, search }}
+                    className={cn(
+                      "focus-visible:ring-ring rounded-sm outline-none after:absolute after:inset-0 focus-visible:ring-2",
+                      task.status === "DONE" && "text-muted-foreground line-through"
+                    )}
+                  >
+                    {task.title}
+                  </Link>
+                </td>
+                <td className="border-border border-t px-3 py-2.5">
+                  <TaskStatusChip status={task.status} />
+                </td>
+                <td className="border-border border-t px-3 py-2.5">
+                  <TaskPriorityBadge priority={task.priority} />
+                </td>
+                <td className="border-border border-t px-3 py-2.5">
+                  <AssigneeCell
+                    assigneeId={task.assigneeId}
+                    members={members}
+                    membersPending={membersPending}
+                  />
+                </td>
+                <td className="border-border border-t px-3 py-2.5">
+                  <DueDateCell dueDate={task.dueDate} status={task.status} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </ScrollableTableRegion>
     </div>
   )
 }

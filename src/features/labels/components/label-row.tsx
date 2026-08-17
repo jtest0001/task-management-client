@@ -2,7 +2,14 @@ import { DeleteLabelDialog } from "@/features/labels/components/delete-label-dia
 import { EditLabelDialog } from "@/features/labels/components/edit-label-dialog"
 import type { Label } from "@/features/labels/api/labels.api"
 
-export function LabelRow({ label, projectId, editable }: { label: Label; projectId: string; editable: boolean }) {
+interface LabelRowProps {
+  label: Label
+  projectId: string
+  editable: boolean
+  onDeleted?: () => void
+}
+
+export function LabelRow({ label, projectId, editable, onDeleted }: LabelRowProps) {
   return (
     <div className="border-border bg-card flex items-center gap-3 rounded-lg border px-3 py-2.5">
       <span className="size-2 shrink-0 rounded-full" style={{ background: label.color }} aria-hidden="true" />
@@ -11,7 +18,7 @@ export function LabelRow({ label, projectId, editable }: { label: Label; project
       {editable ? (
         <div className="flex shrink-0 items-center gap-1 border-l pl-2">
           <EditLabelDialog label={label} projectId={projectId} />
-          <DeleteLabelDialog label={label} projectId={projectId} />
+          <DeleteLabelDialog label={label} projectId={projectId} onDeleted={onDeleted} />
         </div>
       ) : null}
     </div>

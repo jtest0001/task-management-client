@@ -91,3 +91,8 @@ comment's author may edit or delete it.
 - Accessibility is part of the feature, not a later pass: real buttons, labelled inputs,
   keyboard-navigable dialogs, status never conveyed by colour alone.
 - Prefer clarity over cleverness. No abstraction without a second real caller.
+- Toasts are for a failure with no form or field to host the message — the destructive-action
+  dialogs (delete project/task/comment/member/label), sign-out, and label attach/detach. Every
+  other error renders inline next to what it's about (`ErrorState`, a field error, `role="alert"`
+  text) instead. There are no success toasts: success is signalled by the thing itself changing,
+  which is the right default for a list-first app — don't add one for a new mutation.

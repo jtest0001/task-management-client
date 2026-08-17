@@ -5,6 +5,7 @@ import { MemoryRouter } from "react-router"
 
 import { AuthProvider } from "@/features/auth/auth-provider"
 import { createQueryClient } from "@/lib/query/query-client"
+import { ThemeProvider } from "@/lib/theme/theme-provider"
 
 interface RenderOptions {
   route?: string
@@ -23,11 +24,13 @@ export function renderApp(ui: ReactNode, { route = "/" }: RenderOptions = {}) {
   return {
     queryClient,
     ...render(
-      <QueryClientProvider client={queryClient}>
-        <MemoryRouter initialEntries={[route]}>
-          <AuthProvider>{ui}</AuthProvider>
-        </MemoryRouter>
-      </QueryClientProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter initialEntries={[route]}>
+            <AuthProvider>{ui}</AuthProvider>
+          </MemoryRouter>
+        </QueryClientProvider>
+      </ThemeProvider>
     )
   }
 }

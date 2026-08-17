@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 
+import { BusyRegion } from "@/components/busy-region"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useComments } from "@/features/comments/api/comments.queries"
@@ -10,20 +11,25 @@ import { toApiError } from "@/lib/api/errors"
 
 const COMMENTS_COLLAPSED = 5
 
-export function CommentsSection({ taskId }: { taskId: string }) {
+interface CommentsSectionProps {
+  taskId: string
+}
+
+export function CommentsSection({ taskId }: CommentsSectionProps) {
   const [expanded, setExpanded] = useState(false)
   const { data, isPending, isError, error } = useComments(taskId)
   const createComment = useCreateComment(taskId)
+  const headingRef = useRef<HTMLHeadingElement>(null)
 
   if (isPending) {
     return (
       <section>
         <h3 className="text-sm font-semibold">Comments</h3>
-        <div className="mt-2 flex flex-col gap-2" aria-hidden="true">
+        <BusyRegion label="Loading comments" className="mt-2 flex flex-col gap-2">
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-12 w-2/3" />
-        </div>
+        </BusyRegion>
       </section>
     )
   }
@@ -45,7 +51,9 @@ export function CommentsSection({ taskId }: { taskId: string }) {
 
   return (
     <section>
-      <h3 className="text-sm font-semibold">Comments</h3>
+      <h3 ref={headingRef} tabIndex={-1} className="text-sm font-semibold outline-none">
+        Comments
+      </h3>
 
       {comments.length === 0 ? (
         <p className="text-muted-foreground mt-2 text-sm">No comments yet.</p>
@@ -56,6 +64,7 @@ export function CommentsSection({ taskId }: { taskId: string }) {
               type="button"
               variant="ghost"
               size="sm"
+              aria-expanded={expanded}
               className="mt-2 h-auto p-0 text-xs font-normal"
               onClick={() => setExpanded((prev) => !prev)}
             >
@@ -65,7 +74,12 @@ export function CommentsSection({ taskId }: { taskId: string }) {
 
           <ol className="mt-2 flex flex-col gap-4">
             {visible.map((comment) => (
-              <CommentItem key={comment.id} comment={comment} taskId={taskId} />
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                taskId={taskId}
+                onCommentDeleted={() => headingRef.current?.focus()}
+              />
             ))}
           </ol>
 

@@ -1,6 +1,6 @@
 import { Link } from "react-router"
-
 import { cn } from "@/lib/utils"
+import TasklyLogo from "@/assets/taskly-logo.svg?react"
 
 interface LogoProps {
   /** `lg` is the auth-screen size; the default matches the app shell's topbar. */
@@ -19,25 +19,7 @@ export function Logo({ size = "default", className }: LogoProps) {
         className
       )}
     >
-      <span
-        aria-hidden
-        className={cn(
-          "bg-primary text-primary-foreground grid shrink-0 place-items-center rounded-[0.5rem]",
-          size === "lg" ? "size-9" : "size-7"
-        )}
-      >
-        <svg
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={size === "lg" ? "size-5" : "size-4"}
-        >
-          <path d="M2.5 8.5l3 3 8-8" />
-        </svg>
-      </span>
+      <TasklyLogo className="size-9" />
       {""}
       Taskly
     </Link>

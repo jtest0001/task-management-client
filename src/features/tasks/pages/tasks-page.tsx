@@ -1,5 +1,7 @@
+import { useRef } from "react"
 import { Outlet, useParams, useSearchParams } from "react-router"
 
+import { useRouteHeading } from "@/app/router/route-focus-context"
 import { ErrorState } from "@/components/error-state"
 import { useMembers } from "@/features/members/api/members.queries"
 import { useTaskList } from "@/features/tasks/api/tasks.queries"
@@ -12,6 +14,8 @@ export function TasksPage() {
   const { projectId } = useParams<{ projectId: string }>()
   const [searchParams, setSearchParams] = useSearchParams()
   const query = parseTaskListParams(searchParams)
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const registerRouteHeading = useRouteHeading<HTMLHeadingElement>()
 
   const { data: members, isPending: membersPending } = useMembers(projectId)
   const {
@@ -32,15 +36,30 @@ export function TasksPage() {
     setSearchParams(toTaskListSearchParams({ ...query, page }))
   }
 
+  // "Clear filters" and "Back to first page" both re-render the table out from under the
+  // button that was just pressed — move focus to the heading instead of losing it to <body>.
   const clearFilters = () => {
     setSearchParams(new URLSearchParams(), { replace: true })
+    headingRef.current?.focus()
+  }
+
+  const backToFirstPage = () => {
+    setSearchParams(toTaskListSearchParams({ ...query, page: 1 }))
+    headingRef.current?.focus()
   }
 
   return (
     <div className="flex flex-col gap-4 px-6">
-      {/* The active tab already says "Tasks" — this is a landmark for screen readers, not a
-          visible heading. */}
-      <h2 className="sr-only">Tasks</h2>
+      <h2
+        ref={(el) => {
+          headingRef.current = el
+          registerRouteHeading(el)
+        }}
+        tabIndex={-1}
+        className="sr-only"
+      >
+        Tasks
+      </h2>
 
       <TaskToolbar
         query={query}
@@ -63,9 +82,9 @@ export function TasksPage() {
             search={searchParams.toString()}
             projectId={projectId ?? ""}
             onClearFilters={clearFilters}
-            onBackToFirstPage={() => goToPage(1)}
+            onBackToFirstPage={backToFirstPage}
           />
-          {tasks.data.length > 0 && <TaskPagination pagination={tasks.pagination} onPageChange={goToPage} />}
+          <TaskPagination pagination={tasks.pagination} onPageChange={goToPage} />
         </>
       ) : null}
 

@@ -68,7 +68,10 @@ export function TaskToolbar({ query, members, membersPending, onFilterChange }: 
           <Label htmlFor="task-search" className="sr-only">
             Search tasks by title
           </Label>
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
+          <Search
+            aria-hidden="true"
+            className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2"
+          />
           <Input
             id="task-search"
             ref={searchInputRef}

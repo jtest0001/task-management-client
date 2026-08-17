@@ -17,7 +17,13 @@ import { useRemoveMember } from "@/features/members/api/members.mutations"
 import { toApiError } from "@/lib/api/errors"
 import type { Member } from "@/features/members/api/members.api"
 
-export function RemoveMemberDialog({ projectId, member }: { projectId: string; member: Member }) {
+interface RemoveMemberDialogProps {
+  projectId: string
+  member: Member
+  onRemoved?: () => void
+}
+
+export function RemoveMemberDialog({ projectId, member, onRemoved }: RemoveMemberDialogProps) {
   const [open, setOpen] = useState(false)
   const removeMember = useRemoveMember(projectId)
 
@@ -25,6 +31,7 @@ export function RemoveMemberDialog({ projectId, member }: { projectId: string; m
     try {
       await removeMember.mutateAsync(member.user.id)
       setOpen(false)
+      setTimeout(() => onRemoved?.())
     } catch (error) {
       setOpen(false)
       toast.error(toApiError(error).message)

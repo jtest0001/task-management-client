@@ -1,25 +1,78 @@
+import { MenuIcon } from "lucide-react"
+import { useEffect, useState } from "react"
 import { Outlet } from "react-router"
 
 import { UserMenu } from "@/app/layout/user-menu"
+import { RouteFocusProvider } from "@/app/router/route-focus"
 import { Logo } from "@/components/logo"
+import { ModeToggle } from "@/components/mode-toggle"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { ProjectNav } from "@/features/projects/components/project-nav"
 
-/** The persistent frame around every signed-in screen: a slim top bar and a sidebar slot. */
 export function AppShell() {
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
+  // `SheetContent` is only visually hidden by `md:hidden` — its overlay and focus trap stay
+  // mounted. Resizing past the desktop breakpoint while it's open would otherwise leave the
+  // page behind an invisible, still-active dialog.
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 768px)")
+    const onChange = (event: MediaQueryListEvent) => {
+      if (event.matches) setMobileNavOpen(false)
+    }
+    media.addEventListener("change", onChange)
+    return () => media.removeEventListener("change", onChange)
+  }, [])
+
   return (
     <div className="flex min-h-svh flex-col">
+      <a
+        href="#main-content"
+        className="bg-background text-foreground focus-visible:ring-ring sr-only rounded-md px-3 py-2 text-sm font-medium shadow-md focus-visible:not-sr-only focus-visible:fixed focus-visible:top-2 focus-visible:left-2 focus-visible:z-50 focus-visible:ring-3 focus-visible:outline-none"
+      >
+        Skip to content
+      </a>
+
       <header className="bg-background flex h-14 shrink-0 items-center justify-between gap-4 border-b px-4">
-        <Logo />
-        <UserMenu />
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="md:hidden"
+            aria-label="Open project menu"
+            onClick={() => setMobileNavOpen(true)}
+          >
+            <MenuIcon aria-hidden="true" />
+          </Button>
+          <Logo />
+        </div>
+        <div className="flex items-center gap-1">
+          <ModeToggle />
+          <UserMenu />
+        </div>
       </header>
 
       <div className="flex flex-1 flex-col md:flex-row">
-        <aside className="bg-background w-full shrink-0 md:w-64 md:border-r">
+        <aside className="bg-background hidden shrink-0 md:block md:w-64 md:border-r">
           <ProjectNav />
         </aside>
-        <main className="min-w-0 flex-1 py-6">
-          <Outlet />
-        </main>
+
+        <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
+          <SheetContent side="left" className="w-3/4 gap-0 p-0 md:hidden" showCloseButton={false}>
+            <SheetHeader className="sr-only">
+              <SheetTitle>Projects</SheetTitle>
+              <SheetDescription>Jump to a project or manage the current one.</SheetDescription>
+            </SheetHeader>
+            <ProjectNav onNavigate={() => setMobileNavOpen(false)} />
+          </SheetContent>
+        </Sheet>
+
+        <RouteFocusProvider>
+          <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 py-6">
+            <Outlet />
+          </main>
+        </RouteFocusProvider>
       </div>
     </div>
   )

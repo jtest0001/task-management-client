@@ -17,7 +17,13 @@ import type { Comment } from "@/features/comments/api/comments.api"
 import { useDeleteComment } from "@/features/comments/api/comments.mutations"
 import { toApiError } from "@/lib/api/errors"
 
-export function DeleteCommentDialog({ comment, taskId }: { comment: Comment; taskId: string }) {
+interface DeleteCommentDialogProps {
+  comment: Comment
+  taskId: string
+  onDeleted?: () => void
+}
+
+export function DeleteCommentDialog({ comment, taskId, onDeleted }: DeleteCommentDialogProps) {
   const [open, setOpen] = useState(false)
   const deleteComment = useDeleteComment(comment.id, taskId)
 
@@ -25,6 +31,7 @@ export function DeleteCommentDialog({ comment, taskId }: { comment: Comment; tas
     try {
       await deleteComment.mutateAsync()
       setOpen(false)
+      setTimeout(() => onDeleted?.())
     } catch (error) {
       setOpen(false)
       toast.error(toApiError(error).message)

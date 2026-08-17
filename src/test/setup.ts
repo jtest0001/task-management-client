@@ -12,6 +12,20 @@ import { server } from "@/test/msw/server"
 // rather than a stand-in.
 installInterceptors()
 
+// jsdom doesn't implement matchMedia; ThemeProvider's default "system" theme needs it to
+// resolve the OS preference. Report "no preference" (light) rather than mocking a specific OS.
+window.matchMedia ??= (query: string) =>
+  ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false
+  }) as MediaQueryList
+
 beforeAll(() => {
   server.listen({ onUnhandledRequest: "error" })
 })

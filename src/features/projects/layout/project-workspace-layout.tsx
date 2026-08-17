@@ -1,5 +1,6 @@
 import { Link, Outlet, useParams } from "react-router"
 
+import { BusyRegion } from "@/components/busy-region"
 import { EmptyState } from "@/components/empty-state"
 import { ErrorState } from "@/components/error-state"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -14,7 +15,7 @@ import { CreateTaskDialog } from "@/features/tasks/components/create-task-dialog
 
 function WorkspaceHeaderSkeleton() {
   return (
-    <div className="flex items-start justify-between gap-4">
+    <div className="flex items-start justify-between gap-4 px-6">
       <div className="flex flex-col gap-2">
         <Skeleton className="h-7 w-48" />
         <Skeleton className="h-4 w-64" />
@@ -24,7 +25,11 @@ function WorkspaceHeaderSkeleton() {
   )
 }
 
-function WorkspaceHeader({ project }: { project: ProjectSummary }) {
+interface WorkspaceHeaderProps {
+  project: ProjectSummary
+}
+
+function WorkspaceHeader({ project }: WorkspaceHeaderProps) {
   return (
     <header className="flex flex-wrap items-start justify-between gap-4 px-6">
       <div className="flex flex-col gap-1">
@@ -67,10 +72,10 @@ export function ProjectWorkspaceLayout() {
 
   if (isPending) {
     return (
-      <div className="flex flex-col gap-6">
+      <BusyRegion label="Loading project" className="flex flex-col gap-6">
         <WorkspaceHeaderSkeleton />
-        <Skeleton className="h-8 w-64" />
-      </div>
+        <Skeleton className="mx-6 h-8 w-64" />
+      </BusyRegion>
     )
   }
 

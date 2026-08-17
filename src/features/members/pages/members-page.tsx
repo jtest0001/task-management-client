@@ -1,5 +1,7 @@
+import { useRef } from "react"
 import { useParams } from "react-router"
 
+import { useRouteHeading } from "@/app/router/route-focus-context"
 import { ErrorState } from "@/components/error-state"
 import { AddMemberForm } from "@/features/members/components/add-member-form"
 import { MembersTable, MembersTableSkeleton } from "@/features/members/components/members-table"
@@ -9,6 +11,8 @@ import { canAddMembersToProject } from "@/features/projects/lib/capabilities"
 
 export function MembersPage() {
   const { projectId } = useParams<{ projectId: string }>()
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const registerRouteHeading = useRouteHeading<HTMLHeadingElement>()
   const {
     data: project,
     isPending: isProjectPending,
@@ -22,9 +26,16 @@ export function MembersPage() {
 
   return (
     <div className="flex flex-col gap-4 px-6">
-      {/* The active tab already says "Members" — this is a landmark for screen readers, not a
-          visible heading. */}
-      <h2 className="sr-only">Members</h2>
+      <h2
+        ref={(el) => {
+          headingRef.current = el
+          registerRouteHeading(el)
+        }}
+        tabIndex={-1}
+        className="sr-only"
+      >
+        Members
+      </h2>
 
       {projectId && canAddMembersToProject(role) && <AddMemberForm projectId={projectId} />}
 
@@ -36,7 +47,12 @@ export function MembersPage() {
           {isError && <ErrorState error={error} onRetry={() => refetch()} />}
           {!isProjectPending && !isMembersPending && !isError && members && projectId && role ? (
             <>
-              <MembersTable projectId={projectId} role={role} members={members} />
+              <MembersTable
+                projectId={projectId}
+                role={role}
+                members={members}
+                onMemberRemoved={() => headingRef.current?.focus()}
+              />
               {members.length === 1 &&
                 (canAddMembersToProject(role) ? (
                   <p className="text-muted-foreground text-sm">
