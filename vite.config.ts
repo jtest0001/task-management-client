@@ -7,11 +7,11 @@ import svgr from "vite-plugin-svgr"
 
 // The dev server deliberately does NOT proxy the API.
 //
-// The backend scopes its refresh cookie to `Path=/auth`. Proxying through something like
-// `/api/*` would make the browser's request path `/api/auth/refresh`, which does not match
-// that cookie path, so the cookie would silently never be sent and every refresh would fail.
-// Talking to http://localhost:3000 directly keeps the path (and therefore the cookie) intact;
-// the backend already allows this origin with `credentials: true`.
+// The backend mounts every route under `/api` and scopes its refresh cookie to
+// `Path=/api/auth`. A dev proxy would have to preserve that exact path to keep the cookie
+// working, which buys nothing locally: talking to http://localhost:3000/api directly keeps
+// the path (and therefore the cookie) intact, and the backend already allows this origin
+// with `credentials: true`. In production that same path is preserved by the Vercel rewrite.
 export default defineConfig({
   plugins: [react(), tailwindcss(), svgr()],
   resolve: {

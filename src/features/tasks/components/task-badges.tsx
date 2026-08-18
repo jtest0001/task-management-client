@@ -17,7 +17,7 @@ export function TaskStatusChip({ status }: { status: TaskStatus }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-md px-3 py-1 text-sm font-semibold",
+        "inline-flex items-center gap-2 rounded-md px-3 py-1 text-sm font-semibold whitespace-nowrap",
         STATUS_CLASSES[status]
       )}
     >

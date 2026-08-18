@@ -28,7 +28,7 @@ Seed accounts all use `Password123!` — `alice@example.com` (OWNER), `bob@examp
 ```
 src/
 ├── app/          providers, router, layout shell
-├── components/   shared UI; components/ui is vendored shadcn — do not hand-edit
+├── components/   shared UI; components/ui is shadcn-sourced — extend deliberately, don't patch ad hoc
 ├── features/     one folder per domain: auth, projects, tasks, comments, members, labels
 ├── lib/          api client, query client, forms, utils
 └── types/        cross-feature domain types
@@ -91,6 +91,14 @@ comment's author may edit or delete it.
 - Accessibility is part of the feature, not a later pass: real buttons, labelled inputs,
   keyboard-navigable dialogs, status never conveyed by colour alone.
 - Prefer clarity over cleverness. No abstraction without a second real caller.
+- `components/ui` isn't a `node_modules` dependency — the shadcn CLI copies source straight into
+  the repo, so it's local code you own. Editing it isn't off-limits, but a change there should be
+  a deliberate, project-wide decision (add a `cva` variant, adjust a token) — the kind you'd want
+  every caller to inherit — not a fix scoped to whatever you're touching right now. For a
+  one-off/local need, override from the call site or from outside the component (an unlayered
+  CSS rule, a wrapper) instead of editing the primitive. If a change to `components/ui` can't be
+  described as "every user of this component should now behave this way," it doesn't belong
+  there.
 - Toasts are for a failure with no form or field to host the message — the destructive-action
   dialogs (delete project/task/comment/member/label), sign-out, and label attach/detach. Every
   other error renders inline next to what it's about (`ErrorState`, a field error, `role="alert"`

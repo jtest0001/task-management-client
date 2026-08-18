@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/empty-state"
 import { ScrollableTableRegion } from "@/components/scrollable-table-region"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { TaskPriorityBadge, TaskStatusChip } from "@/features/tasks/components/task-badges"
 import { CreateTaskDialog } from "@/features/tasks/components/create-task-dialog"
 import type { Task } from "@/features/tasks/api/tasks.api"
@@ -149,32 +150,25 @@ export function TaskTable({
       {isPlaceholderData ? (
         <div
           aria-hidden="true"
-          className="bg-primary/70 absolute inset-x-0 top-0 z-10 h-0.5 animate-pulse rounded-full"
+          className="bg-primary/70 absolute inset-x-3 top-0 z-10 h-0.5 animate-pulse rounded-full"
         />
       ) : null}
       <ScrollableTableRegion label="Tasks">
-        <table
-          className={cn("w-full border-collapse text-sm", isPlaceholderData && "pointer-events-none")}
-          aria-busy={isPlaceholderData}
-        >
+        <Table unwrapped className={cn(isPlaceholderData && "pointer-events-none")} aria-busy={isPlaceholderData}>
           <caption className="sr-only">Tasks</caption>
-          <thead>
-            <tr className="bg-muted/50">
+          <TableHeader>
+            <TableRow className="bg-muted/50">
               {COLUMNS.map((col) => (
-                <th
-                  key={col}
-                  scope="col"
-                  className="text-muted-foreground border-border border-t px-3 py-2.5 text-left text-sm font-medium whitespace-nowrap"
-                >
+                <TableHead key={col} className="text-muted-foreground px-3 py-2.5">
                   {col}
-                </th>
+                </TableHead>
               ))}
-            </tr>
-          </thead>
-          <tbody>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {tasks.map((task) => (
-              <tr key={task.id} className="hover:bg-muted/50 relative">
-                <td className="border-border border-t px-3 py-2.5 font-medium">
+              <TableRow key={task.id} className="relative">
+                <TableCell className="px-3 py-2.5 font-medium whitespace-normal">
                   <Link
                     to={{ pathname: task.id, search }}
                     className={cn(
@@ -184,27 +178,27 @@ export function TaskTable({
                   >
                     {task.title}
                   </Link>
-                </td>
-                <td className="border-border border-t px-3 py-2.5">
+                </TableCell>
+                <TableCell className="px-3 py-2.5">
                   <TaskStatusChip status={task.status} />
-                </td>
-                <td className="border-border border-t px-3 py-2.5">
+                </TableCell>
+                <TableCell className="px-3 py-2.5">
                   <TaskPriorityBadge priority={task.priority} />
-                </td>
-                <td className="border-border border-t px-3 py-2.5">
+                </TableCell>
+                <TableCell className="px-3 py-2.5">
                   <AssigneeCell
                     assigneeId={task.assigneeId}
                     members={members}
                     membersPending={membersPending}
                   />
-                </td>
-                <td className="border-border border-t px-3 py-2.5">
+                </TableCell>
+                <TableCell className="px-3 py-2.5">
                   <DueDateCell dueDate={task.dueDate} status={task.status} />
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </ScrollableTableRegion>
     </div>
   )
