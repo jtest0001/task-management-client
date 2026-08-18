@@ -1,0 +1,29 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/auth/:path*",
+      "destination": "https://task-management-api-sc2b.onrender.com/auth/:path*"
+    },
+    {
+      "source": "/projects/:path*",
+      "destination": "https://task-management-api-sc2b.onrender.com/projects/:path*"
+    },
+    {
+      "source": "/tasks/:path*",
+      "destination": "https://task-management-api-sc2b.onrender.com/tasks/:path*"
+    },
+    {
+      "source": "/comments/:path*",
+      "destination": "https://task-management-api-sc2b.onrender.com/comments/:path*"
+    },
+    {
+      "source": "/labels/:path*",
+      "destination": "https://task-management-api-sc2b.onrender.com/labels/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
