@@ -63,8 +63,8 @@ export function TaskToolbar({ query, members, membersPending, onFilterChange }: 
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="border-border bg-card flex flex-wrap items-center gap-2 rounded-xl border p-3 shadow-xs">
-        <div className="relative min-w-48 flex-1 basis-64">
+      <div className="border-border bg-card lg: flex flex-col gap-2 rounded-xl border p-3 shadow-xs lg:flex-row lg:items-center">
+        <div className="relative flex-1">
           <Label htmlFor="task-search" className="sr-only">
             Search tasks by title
           </Label>
@@ -83,7 +83,7 @@ export function TaskToolbar({ query, members, membersPending, onFilterChange }: 
           />
         </div>
 
-        <div className="min-w-36">
+        <div className="flex-1">
           <Label htmlFor="task-status" className="sr-only">
             Filter by status
           </Label>
@@ -101,7 +101,7 @@ export function TaskToolbar({ query, members, membersPending, onFilterChange }: 
           </NativeSelect>
         </div>
 
-        <div className="min-w-36">
+        <div className="flex-1">
           <Label htmlFor="task-priority" className="sr-only">
             Filter by priority
           </Label>
@@ -119,7 +119,7 @@ export function TaskToolbar({ query, members, membersPending, onFilterChange }: 
           </NativeSelect>
         </div>
 
-        <div className="min-w-40">
+        <div className="flex-1">
           <Label htmlFor="task-assignee" className="sr-only">
             Filter by assignee
           </Label>
@@ -138,7 +138,7 @@ export function TaskToolbar({ query, members, membersPending, onFilterChange }: 
           </NativeSelect>
         </div>
 
-        <div className="min-w-44">
+        <div className="flex-1">
           <Label htmlFor="task-sort" className="sr-only">
             Sort tasks
           </Label>

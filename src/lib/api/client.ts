@@ -1,18 +1,20 @@
 import axios from "axios"
 
 /**
- * In production this is intentionally empty so axios issues same-origin, relative requests
- * (`/auth/refresh`, `/projects`, ...). Those are proxied to the API by the rewrites in
- * `vercel.json`, which deliberately preserve the path rather than nesting under a prefix:
- * the refresh cookie is scoped `Path=/auth`, so `/api/auth/refresh` would silently never
- * match it. Keeping the browser on one origin is also what lets the refresh cookie stay
- * `SameSite=Lax` — a cross-site setup would force `SameSite=None`, giving up the CSRF
- * protection we get for free. See BACKLOG.md "Security model" for the full reasoning.
+ * Every API route is mounted under `/api` on the server, and in production the browser reaches
+ * it same-origin through the rewrite in `vercel.json`. That prefix exists because the app's own
+ * page routes (`/projects`, `/projects/:projectId/tasks`, `.../members`, `.../labels`) are
+ * identical to the REST routes of the same name — a page navigation and an XHR cannot be told
+ * apart by path, so without the prefix the proxy answers page loads with JSON.
+ *
+ * Staying on a single origin is also what lets the refresh cookie remain `SameSite=Lax`; a
+ * cross-site setup would force `SameSite=None` and give up the CSRF protection that comes for
+ * free. See BACKLOG.md "Security model" in the API repo for the full reasoning.
  *
  * Locally there is no proxy (see the note in vite.config.ts), so we talk to the API directly.
  */
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? "http://localhost:3000" : "")
+  import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? "http://localhost:3000/api" : "/api")
 
 /**
  * The single configured instance every feature module uses.
