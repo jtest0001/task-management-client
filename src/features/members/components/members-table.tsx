@@ -2,6 +2,7 @@ import { BusyRegion } from "@/components/busy-region"
 import { ScrollableTableRegion } from "@/components/scrollable-table-region"
 import { UserAvatar } from "@/components/user-avatar"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAuth } from "@/features/auth/auth-context"
 import { MemberRoleSelect } from "@/features/members/components/member-role-select"
 import { RemoveMemberDialog } from "@/features/members/components/remove-member-dialog"
@@ -60,25 +61,21 @@ export function MembersTable({ projectId, role, members, onMemberRemoved }: Memb
 
   return (
     <ScrollableTableRegion label="Members">
-      <table className="w-full border-collapse text-sm">
+      <Table unwrapped>
         <caption className="sr-only">Members</caption>
-        <thead>
-          <tr className="bg-muted/50">
+        <TableHeader>
+          <TableRow className="bg-muted/50">
             {COLUMNS.map((col) => (
-              <th
-                key={col}
-                scope="col"
-                className="text-muted-foreground border-border border-t px-3 py-2.5 text-left text-sm font-medium whitespace-nowrap"
-              >
+              <TableHead key={col} className="text-muted-foreground px-3 py-2.5">
                 {col}
-              </th>
+              </TableHead>
             ))}
-          </tr>
-        </thead>
-        <tbody>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {ordered.map((member) => (
-            <tr key={member.user.id} className="hover:bg-muted/50">
-              <td className="border-border border-t px-3 py-2.5">
+            <TableRow key={member.user.id}>
+              <TableCell className="px-3 py-2.5">
                 <div className="flex items-center gap-2">
                   <UserAvatar email={member.user.email} />
                   <span className="text-sm">{member.user.email}</span>
@@ -86,26 +83,26 @@ export function MembersTable({ projectId, role, members, onMemberRemoved }: Memb
                     <span className="text-muted-foreground text-xs">(You)</span>
                   )}
                 </div>
-              </td>
-              <td className="border-border border-t px-3 py-2.5">
+              </TableCell>
+              <TableCell className="px-3 py-2.5">
                 {canChangeMemberRole(role, member.role) ? (
                   <MemberRoleSelect projectId={projectId} member={member} />
                 ) : (
                   <RoleBadge role={member.role} />
                 )}
-              </td>
-              <td className="border-border border-t px-3 py-2.5">
+              </TableCell>
+              <TableCell className="px-3 py-2.5">
                 <span className="text-sm">{formatDueDate(member.joinedAt)}</span>
-              </td>
-              <td className="border-border border-t px-3 py-2.5">
+              </TableCell>
+              <TableCell className="px-3 py-2.5">
                 {canRemoveMember(role, member.role) && (
                   <RemoveMemberDialog projectId={projectId} member={member} onRemoved={onMemberRemoved} />
                 )}
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </ScrollableTableRegion>
   )
 }

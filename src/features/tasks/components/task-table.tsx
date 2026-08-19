@@ -154,7 +154,11 @@ export function TaskTable({
         />
       ) : null}
       <ScrollableTableRegion label="Tasks">
-        <Table unwrapped className={cn(isPlaceholderData && "pointer-events-none")} aria-busy={isPlaceholderData}>
+        <Table
+          unwrapped
+          className={cn(isPlaceholderData && "pointer-events-none")}
+          aria-busy={isPlaceholderData}
+        >
           <caption className="sr-only">Tasks</caption>
           <TableHeader>
             <TableRow className="bg-muted/50">
@@ -167,8 +171,8 @@ export function TaskTable({
           </TableHeader>
           <TableBody>
             {tasks.map((task) => (
-              <TableRow key={task.id} className="relative">
-                <TableCell className="px-3 py-2.5 font-medium whitespace-normal">
+              <TableRow key={task.id}>
+                <TableCell className="relative px-3 py-2.5 font-medium whitespace-normal">
                   <Link
                     to={{ pathname: task.id, search }}
                     className={cn(
